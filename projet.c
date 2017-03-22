@@ -40,30 +40,6 @@
 
 
 
-/*******************************************************************
-*     Déclaration des fonctions "principales" de l'application     *
-*******************************************************************/
-
-void afficherIntitule();
-int connection();
-void afficherMessageConnection(int status_connection);
-int afficherEtChoisirOptionsMenu();
-void afficherEnteteOptionChoisie(int numero_option);
-int chargerListeMembres();
-int insererNouveauMembre();
-void afficherMessageInsererNouveauMembre(int status_ajout);
-int rechercherMembre(int numero_membre);
-void afficherMessageRechercherMembre(int status_recherche);
-int afficherMembre(int numero_membre);
-int modifierMembre(int numero_membre);
-int supprimerMembre(int numero_membre);
-int verifierSortie(char* chaine);
-void afficherMessageSortie();
-
-
-
-
-
 /***********************************************************************
 *     Déclaration des fonctions "supplémentaires" de l'application     *
 ***********************************************************************/
@@ -73,6 +49,7 @@ int estAlphabetique(char *chaine);
 int estNumerique(char *chaine);
 void enleverCaracteresRestants(char *chaine);
 void enleverCaracteresSuperflus(void);
+int comparer2chaines(char* chaine1, char* chaine2);
 
 
 
@@ -144,6 +121,7 @@ typedef formation* liste_formations;
 * Traitement élémentaire sur les listes chainées. *
 **************************************************/
 
+
 /***********************
 *     Utilisateurs     *
 ***********************/
@@ -172,6 +150,7 @@ liste_utilisateurs insererEnQueueUtilisateur(liste_utilisateurs liste, char* log
 	temporaire->suivant = nouvel_utilisateur;
 	return liste;
 }
+
 
 /******************
 *     Membres     *
@@ -208,13 +187,13 @@ liste_membres insererEnQueueMembre(liste_membres liste, char numero_membre[TAILL
 // Afficher la liste des membres
 void afficherListeMembres(liste_membres liste)
 {
-	element* temporaire = liste;
+	membre* temporaire = liste;
 	if(temporaire != NULL) {
-	while(temporaire->suivant != NULL) {
-		printf("%s:%s:%s:%s:\n", temporaire->numero_membre, temporaire->nom_membre, temporaire->prenoms_membre, temporaire->adresse_membre);
-		temporaire = temporaire->suivant;
-	}
-	printf("%s:%s:%s:%s:\n|NIL|", temporaire->numero_membre, temporaire->nom_membre, temporaire->prenoms_membre, temporaire->adresse_membre, temporaire->valeur);
+		while(temporaire->suivant != NULL) {
+			printf("%s:%s:%s:%s", temporaire->numero_membre, temporaire->nom_membre, temporaire->prenoms_membre, temporaire->adresse_membre);
+			temporaire = temporaire->suivant;
+		}
+		printf("%s:%s:%s:%s\n", temporaire->numero_membre, temporaire->nom_membre, temporaire->prenoms_membre, temporaire->adresse_membre);
 	}
 	else {
 		printf("Cette liste est vide.\n");
@@ -237,13 +216,36 @@ liste_formations creerFormation()
 
 
 
+/*******************************************************************
+*     Déclaration des fonctions "principales" de l'application     *
+*******************************************************************/
+
+void afficherIntitule();
+int connection();
+void afficherMessageConnection(int status_connection);
+int afficherEtChoisirOptionsMenu();
+void afficherEnteteOptionChoisie(int numero_option);
+liste_membres chargerListeMembres();
+liste_membres insererNouveauMembre();
+void afficherMessageInsererNouveauMembre(int status_ajout);
+int rechercherMembre(liste_membres liste);
+void afficherMembre(liste_membres liste);
+liste_membres modifierMembre(liste_membres liste);
+liste_membres supprimerMembre(liste_membres liste);
+int verifierSortie(char* chaine);
+void afficherMessageSortie();
+
+
+
+
+
 /**************************
 *     Fonction main()     *
 **************************/
 
 int main(int argc, char const *argv[])
 {
-	int sortie=0, status_connection=0, choix_menu=0;
+	int sortie=0, status_connection=ECHEC, status_recherche=ECHEC, choix_menu=0;
 	// On affiche l'entete (accueil) de l'application
 	afficherIntitule();
 	// ONn demande à l'utilisareur de se connecter tant qu'il n'a pas choisi de quitter, ou qu'il ne s'est pas connecté
@@ -271,6 +273,25 @@ int main(int argc, char const *argv[])
 	}
 	// On affiche l'entete de l'option choisie
 	afficherEnteteOptionChoisie(choix_menu);
+	// On déclare et initialise la liste des membres
+	liste_membres membres;
+	membres = creerMembre();
+	// On charge les membres depuis le fichier vers une liste chainée
+	membres = chargerListeMembres();
+	// Affichage de la liste des membres (vide)
+	afficherListeMembres(membres);
+	// Ajouter un nouveau membre à la liste
+	//membres = insererNouveauMembre(membres);
+	// Affichage de la liste des membres (vide)
+	//afficherListeMembres(membres);
+	// Rechercher un membre
+	// status_recherche = rechercherMembre(membres);
+	//membres = modifierMembre(membres);
+	// Affichage de la liste des membres (vide)
+	//afficherListeMembres(membres);
+	membres = supprimerMembre(membres);
+	// Affichage de la liste des membres (vide)
+	afficherListeMembres(membres);
 	return SUCCES;
 }
 
@@ -310,10 +331,10 @@ void afficherIntitule()
 */
 int connection()
 {
-	char login_saisi[TAILLE_XL], mot_de_passe_saisi[TAILLE_XL], ligne_membre[TAILLE_XXL], delimiteur[2]=":", *cle, login_temporaire[TAILLE_XL], mot_de_passe_temporaire[TAILLE_XL];
-	int status_connection=ECHEC, status_fermeture=ECHEC, indice_cle=0, utilisateur_trouve=0, sortir_app;
+	char login_saisi[TAILLE_XL], mot_de_passe_saisi[TAILLE_XL], ligne_utilisateur[TAILLE_XXL], delimiteur[2]=":", *cle, login_temporaire[TAILLE_XL], mot_de_passe_temporaire[TAILLE_XL];
+	int status_connection=ECHEC, indice_cle=0, utilisateur_trouve=0, sortir_app=0;
 	FILE* fichier_utilisateurs = NULL;
-	liste_utilisateurs ligne_utilisateur;
+	liste_utilisateurs liste_utilisateur;
 	// On ouvre le fichier contenant les utilisateurs (utilisateurs.txt)
 	fichier_utilisateurs = fopen("utilisateurs.txt", "r");
 	/*
@@ -334,13 +355,11 @@ int connection()
 		printf("Saisissez votre mot de passe : ");
 		fgets(mot_de_passe_saisi, sizeof mot_de_passe_saisi, stdin);
 		enleverCaracteresRestants(mot_de_passe_saisi);
-		// Création d'un nouveau membre
-		creerMembre();
 		// Créer une nouvelle liste d'utilisateurs (vide)
-		ligne_utilisateur = creerUtilisateur();
+		liste_utilisateur = creerUtilisateur();
 		// Tant qu'on n'arrive pas à la fin du fichier et que l'on n'a pas trouvé un utilisateur correspondant aux identifiants 
-		while(fgets(ligne_membre, TAILLE_XXL, fichier_utilisateurs) != NULL && utilisateur_trouve == 0) {
-			cle = strtok(ligne_membre, delimiteur);
+		while(fgets(ligne_utilisateur, TAILLE_XXL, fichier_utilisateurs) != NULL && utilisateur_trouve == 0) {
+			cle = strtok(ligne_utilisateur, delimiteur);
 			indice_cle = 0;
 			while(cle != NULL) {
 				switch(indice_cle) {
@@ -354,8 +373,8 @@ int connection()
 				indice_cle++;
 				cle = strtok(NULL, delimiteur);
 			}
-			ligne_utilisateur = insererEnQueueUtilisateur(ligne_utilisateur, login_temporaire, mot_de_passe_temporaire);
-			if (strcmp(ligne_utilisateur->login_utilisateur, login_saisi) == 0 && strcmp(ligne_utilisateur->mot_de_passe_utilisateur, mot_de_passe_saisi) == 0) {
+			liste_utilisateur = insererEnQueueUtilisateur(liste_utilisateur, login_temporaire, mot_de_passe_temporaire);
+			if (strcmp(liste_utilisateur->login_utilisateur, login_saisi) == 0 && strcmp(liste_utilisateur->mot_de_passe_utilisateur, mot_de_passe_saisi) == 0) {
 				utilisateur_trouve = 1;
 				status_connection = SUCCES;
 			}
@@ -368,12 +387,7 @@ int connection()
 		return status_connection;
 	}
 	// On ferme le fichier qui a été ouvert
-	status_fermeture = fclose(fichier_utilisateurs);
-	// Si le fermeture ne s'est pas bien passé, retourner un code d'érreur (-1)
-	if (status_fermeture == EOF) {
-		status_connection = ERREUR;
-		return status_connection;
-	}
+	fclose(fichier_utilisateurs);
 	// Retourner le status de connection
 	return status_connection;
 }
@@ -469,13 +483,16 @@ void afficherEnteteOptionChoisie(int numero_option)
 /*
 	Cette fonction permet de charger la liste des membres (dans une liste chainée avec laquelle on travaillera plutard)
 	Retourne un status de chargement :
-		0	: Echec de chargement
-		1	: Chargement réussi
+		- NULL: Echec de chargement
+		- Une liste de membres: Chargement réussi
 */
-int chargerListeMembres()
+liste_membres chargerListeMembres()
 {
-	int status_chargement=ECHEC;
-	char numero_membre[TAILLE_L], nom_membre[TAILLE_XL], prenoms_membre[TAILLE_XL], adresse_membre[TAILLE_XXL];
+	int status_chargement=ECHEC, indice_cle=0;
+	char numero_temporaire[TAILLE_L], nom_temporaire[TAILLE_XL], prenoms_temporaire[TAILLE_XL], adresse_temporaire[TAILLE_XXL], ligne_membre[1000], delimiteur[2]=":", *cle;
+	liste_membres membres;
+	// Création d'un nouveau membre (vide)
+	membres = creerMembre();
 	// On déclare une variable qui nous permettra de travailler sur le fichier
 	FILE* fichier_membres = NULL;
 	// On ouvre le fichier contenant les membres (membres.txt) en mode lecture
@@ -485,19 +502,38 @@ int chargerListeMembres()
 		Dans le cas échéant, on peut continuer le traitement du fichier
 	*/
 	if (fichier_membres != NULL) {
-	// Si l'ouverture ne s'est pas bien déroulée, on retourne un code d'érreur (-1)
+		// Tant qu'on n'arrive pas à la fin du fichier
+		while(fgets(ligne_membre, 1000, fichier_membres) != NULL) {
+			cle = strtok(ligne_membre, delimiteur);
+			indice_cle = 0;
+			while(cle != NULL) {
+				switch(indice_cle) {
+					case 0 :
+						strcpy(numero_temporaire, cle);
+						break;
+					case 1 :
+						strcpy(nom_temporaire, cle);
+						break;
+					case 2 :
+						strcpy(prenoms_temporaire, cle);
+						break;
+					case 3 :
+						strcpy(adresse_temporaire, cle);
+						break;
+				}
+				indice_cle++;
+				cle = strtok(NULL, delimiteur);
+			}
+			membres = insererEnQueueMembre(membres, numero_temporaire, nom_temporaire, prenoms_temporaire, adresse_temporaire, NULL);
+		}
+	}
+	// Si l'ouverture ne s'est pas bien déroulée, on retourne NULL
 	else {
-		status_chargement = ECHEC;
-		return status_chargement;
+		return NULL;
 	}
 	// On ferme le fichier qui a été ouvert
-	status_fermeture = fclose(fichier_membres);
-	// Si le fermeture ne s'est pas bien passé, retourner un code d'érreur (-1)
-	if (status_fermeture == EOF) {
-		status_chargement = ECHEC;
-		return status_chargement;
-	}
-	return status_chargement;
+	fclose(fichier_membres);
+	return membres;
 }
 
 /*
@@ -507,87 +543,64 @@ int chargerListeMembres()
 		0	: Ce membre éxiste déjà
 		1	: Ajout réussi
 */
-int insererNouveauMembre()
+liste_membres insererNouveauMembre(liste_membres membres)
 {
 	char numero_membre[TAILLE_L], nom_membre[TAILLE_XL], prenoms_membre[TAILLE_XL], adresse_membre[TAILLE_XXL];
 	int status_ajout=ECHEC, status_alpha_numerique=ECHEC, status_alphabetique=ECHEC, status_numerique=ECHEC, status_fermeture=ECHEC;
-	FILE* fichier_membres = NULL;
-	// On ouvre le fichier contenant les membres (membres.txt)
-	fichier_membres = fopen("membres.txt", "a+");
-	/*
-		On teste si l'ouverture s'est bien déroulée
-		Dans le cas échéant, on peut continuer le traitement du fichier
-	*/
-	if (fichier_membres != NULL) {
-		status_alphabetique = ECHEC;
-		while (status_numerique == ECHEC) {
-			printf("Saisissez le numéro du membre :");
-			fgets(numero_membre, sizeof numero_membre, stdin);
-			enleverCaracteresRestants(numero_membre);
-			status_numerique = estNumerique(numero_membre);
-			if (status_numerique == ECHEC) {
-				printf("Le numéro du membre ne doit contenir que des chiffres. Veuillez le retaper s'il vous plait.\n\n");
-			}
-			else {
-				status_numerique = SUCCES;
-			}
+	liste_membres temporaire=membres;
+	while (status_numerique == ECHEC) {
+		printf("Saisissez le numéro du membre a ajouter : ");
+		fgets(numero_membre, sizeof numero_membre, stdin);
+		enleverCaracteresRestants(numero_membre);
+		status_numerique = estNumerique(numero_membre);
+		if (status_numerique == ECHEC) {
+			printf("Le numéro du membre ne doit contenir que des chiffres. Veuillez le retaper s'il vous plait.\n\n");
 		}
-		while (status_alphabetique == ECHEC) {
-			printf("Saisissez le nom du membre :");
-			fgets(nom_membre, sizeof nom_membre, stdin);
-			enleverCaracteresRestants(nom_membre);
-			status_alphabetique = estAlphabetique(nom_membre);
-			if (status_alphabetique == ECHEC) {
-				printf("Le nom du membre ne doit contenir que des lettres alphabétiques et/ou espaces. Veuillez le retaper s'il vous plait.\n\n");
-			}
-			else {
-				status_alphabetique = SUCCES;
-			}
+		else {
+			status_numerique = SUCCES;
 		}
-		status_alphabetique = ECHEC;
-		while (status_alphabetique == ECHEC) {
-			printf("Saisissez le prénom du membre :");
-			fgets(prenoms_membre, sizeof prenoms_membre, stdin);
-			enleverCaracteresRestants(prenoms_membre);
-			status_alphabetique = estAlphabetique(prenoms_membre);
-			if (status_alphabetique == ECHEC) {
-				printf("Le prénom du membre ne doit contenir que des lettres alphabétiques et/ou espaces. Veuillez le retaper s'il vous plait.\n\n");
-			}
-			else {
-				status_alphabetique = SUCCES;
-			}
-		}
-		while (status_alpha_numerique == ECHEC) {
-			printf("Saisissez l'adresse du membre :");
-			fgets(adresse_membre, sizeof adresse_membre, stdin);
-			enleverCaracteresRestants(adresse_membre);
-			status_alpha_numerique = estAlphaNumerique(adresse_membre);
-			if (status_alpha_numerique == ECHEC) {
-				printf("L'adresse du membre ne doit contenir que des lettres alphabétiques, des chiffres, et espaces. Veuillez le retaper s'il vous plait.\n\n");
-			}
-			else {
-				status_alpha_numerique = SUCCES;
-			}
-		}
-		status_alphabetique = ECHEC;
-		// Vérifier si le membre éxiste déja
-		// Ajouter ce membre dans le fichier membres.txt
-		fprintf(fichier_membres, "%s:%s:%s:%s\n", numero_membre, nom_membre, prenoms_membre, adresse_membre);
-		status_ajout = SUCCES;
 	}
-	// Si l'ouverture ne s'est pas bien déroulée, on retourne un code d'érreur (-1)
-	else {
-		status_ajout = ERREUR;
-		return status_ajout;
+	while (status_alphabetique == ECHEC) {
+		printf("Saisissez le nom du membre : ");
+		fgets(nom_membre, sizeof nom_membre, stdin);
+		enleverCaracteresRestants(nom_membre);
+		status_alphabetique = estAlphabetique(nom_membre);
+		if (status_alphabetique == ECHEC) {
+			printf("Le nom du membre ne doit contenir que des lettres alphabétiques et/ou espaces. Veuillez le retaper s'il vous plait.\n\n");
+		}
+		else {
+			status_alphabetique = SUCCES;
+		}
 	}
-	// On ferme le fichier qui a été ouvert
-	status_fermeture = fclose(fichier_membres);
-	// Si le fermeture ne s'est pas bien passé, retourner un code d'érreur (-1)
-	if (status_fermeture == EOF) {
-		status_ajout = ERREUR;
-		return status_ajout;
+	status_alphabetique = ECHEC;
+	while (status_alphabetique == ECHEC) {
+		printf("Saisissez le prénom du membre : ");
+		fgets(prenoms_membre, sizeof prenoms_membre, stdin);
+		enleverCaracteresRestants(prenoms_membre);
+		status_alphabetique = estAlphabetique(prenoms_membre);
+		if (status_alphabetique == ECHEC) {
+			printf("Le prénom du membre ne doit contenir que des lettres alphabétiques et/ou espaces. Veuillez le retaper s'il vous plait.\n\n");
+		}
+		else {
+			status_alphabetique = SUCCES;
+		}
 	}
-	return status_ajout;
+	while (status_alpha_numerique == ECHEC) {
+		printf("Saisissez l'adresse du membre : ");
+		fgets(adresse_membre, sizeof adresse_membre, stdin);
+		enleverCaracteresRestants(adresse_membre);
+		status_alpha_numerique = estAlphaNumerique(adresse_membre);
+		if (status_alpha_numerique == ECHEC) {
+			printf("L'adresse du membre ne doit contenir que des lettres alphabétiques, des chiffres, et espaces. Veuillez le retaper s'il vous plait.\n\n");
+		}
+		else {
+			status_alpha_numerique = SUCCES;
+		}
+	}
+	// Vérifier si le membre éxiste déja
+	// Ajouter dans la structure
+	temporaire = insererEnQueueMembre(temporaire, numero_membre, nom_membre, prenoms_membre, adresse_membre, NULL);
+	return temporaire;
 }
 
 /*
@@ -617,46 +630,186 @@ void afficherMessageInsererNouveauMembre(int status_ajout)
 		0	: Ce membre n'éxiste pas
 		1	: Membre trouvé
 */
-int rechercherMembre(int numero_membre)
+int rechercherMembre(liste_membres liste)
 {
-	int status_recherche;
-	FILE* fichier_membres = NULL;
-	fichier_membres = fopen("membres.txt", "r");
+	if (liste == NULL) {
+		return ECHEC;
+	}
+	char numero_membre[TAILLE_L];
+	int status_numerique = ECHEC, status_recherche=ECHEC;
+	while (status_numerique == ECHEC) {
+		printf("Saisissez le numéro du membre a rechercher : ");
+		fgets(numero_membre, sizeof numero_membre, stdin);
+		enleverCaracteresRestants(numero_membre);
+		status_numerique = estNumerique(numero_membre);
+		if (status_numerique == ECHEC) {
+			printf("Le numéro du membre ne doit contenir que des chiffres. Veuillez le retaper s'il vous plait.\n\n");
+		}
+		else {
+			status_numerique = SUCCES;
+		}
+	}
+	liste_membres temporaire=liste;
+	while(temporaire != NULL) {
+		if (strcmp(numero_membre, temporaire->numero_membre) == SUCCES) {
+			status_recherche = SUCCES;
+			temporaire = temporaire->suivant;
+			break;
+		}
+		temporaire = temporaire->suivant;
+	}
+	if (status_recherche == SUCCES) {
+		afficherMembre(temporaire);
+	}
+	else {
+		printf("Ce membre n'existe pas.\n");
+	}
 	return status_recherche;
 }
 
 /*
-	Cette procedure permet d'afficher un message relatif à un status de recherche d'un membre
-	Status de recherche :
-		-1	: Erreur interne
-		0	: Ce membre n'éxiste pas
-		1	: Membre trouvé
-*/
-void afficherMessageRechercherMembre(int status_recherche)
-{
-	if (status_recherche == ERREUR) {
-		printf("\nUne erreur est survenue lors de la connection. Merci de reessayer plutard.\n");
-	}
-	else if (status_recherche == ECHEC) {
-		printf("\nAucun membre ne correspond au numéro saisi.\n");
-	}
-	else if (status_recherche == SUCCES) {
-		printf("\nMembre trouvé.\n");
-	}
-}
-
-/*
-	Cette fonction permet d'afficher un membre depuis le fichier membres.txt
+	Cette procedure permet d'afficher un membre de la structure
 	Retourne un status d'affichage :
 		-1	: Erreur interne
 		0	: Ce membre n'éxiste pas
 		1	: Membre trouvé
 */
-int afficherMembre(int numero_membre)
+void afficherMembre(liste_membres liste)
 {
-	int membre_existe;
-	membre_existe = rechercherMembre(numero_membre);
+	if (liste != NULL) {
+		printf("Membre numero %s :\n", liste->numero_membre);
+		printf("\tNom : %s\n", liste->nom_membre);
+		printf("\tNom : %s\n", liste->prenoms_membre);
+		printf("\tNom : %s\n", liste->adresse_membre);
+	}
 }
+
+/*
+
+*/
+liste_membres modifierMembre(liste_membres membres)
+{
+	if (membres == NULL) {
+		return ECHEC;
+	}
+	char numero_membre[TAILLE_L];
+	int status_recherche=ECHEC, status_alpha_numerique=ECHEC, status_alphabetique=ECHEC, status_numerique=ECHEC, status_fermeture=ECHEC;
+	while (status_numerique == ECHEC) {
+		printf("Saisissez le numéro du membre a modifier : ");
+		fgets(numero_membre, sizeof numero_membre, stdin);
+		enleverCaracteresRestants(numero_membre);
+		status_numerique = estNumerique(numero_membre);
+		if (status_numerique == ECHEC) {
+			printf("Le numéro du membre ne doit contenir que des chiffres. Veuillez le retaper s'il vous plait.\n\n");
+		}
+		else {
+			status_numerique = SUCCES;
+		}
+	}
+	liste_membres temporaire=membres;
+	while(temporaire != NULL) {
+		if (strcmp(numero_membre, temporaire->numero_membre) == SUCCES) {
+			status_recherche = SUCCES;
+			temporaire = temporaire->suivant;
+			break;
+		}
+		temporaire = temporaire->suivant;
+	}
+	if (status_recherche == SUCCES) {
+		while (status_alphabetique == ECHEC) {
+			printf("Saisissez le nom du membre : ");
+			fgets(temporaire->nom_membre, sizeof temporaire->nom_membre, stdin);
+			enleverCaracteresRestants(temporaire->nom_membre);
+			status_alphabetique = estAlphabetique(temporaire->nom_membre);
+			if (status_alphabetique == ECHEC) {
+				printf("Le nom du membre ne doit contenir que des lettres alphabétiques et/ou espaces. Veuillez le retaper s'il vous plait.\n\n");
+			}
+			else {
+				status_alphabetique = SUCCES;
+			}
+		}
+		status_alphabetique = ECHEC;
+		while (status_alphabetique == ECHEC) {
+			printf("Saisissez le prénom du membre : ");
+			fgets(temporaire->prenoms_membre, sizeof temporaire->prenoms_membre, stdin);
+			enleverCaracteresRestants(temporaire->prenoms_membre);
+			status_alphabetique = estAlphabetique(temporaire->prenoms_membre);
+			if (status_alphabetique == ECHEC) {
+				printf("Le prénom du membre ne doit contenir que des lettres alphabétiques et/ou espaces. Veuillez le retaper s'il vous plait.\n\n");
+			}
+			else {
+				status_alphabetique = SUCCES;
+			}
+		}
+		while (status_alpha_numerique == ECHEC) {
+			printf("Saisissez l'adresse du membre : ");
+			fgets(temporaire->adresse_membre, sizeof temporaire->adresse_membre, stdin);
+			enleverCaracteresRestants(temporaire->adresse_membre);
+			status_alpha_numerique = estAlphaNumerique(temporaire->adresse_membre);
+			if (status_alpha_numerique == ECHEC) {
+				printf("L'adresse du membre ne doit contenir que des lettres alphabétiques, des chiffres, et espaces. Veuillez le retaper s'il vous plait.\n\n");
+			}
+			else {
+				status_alpha_numerique = SUCCES;
+			}
+		}
+	}
+	else {
+		printf("Ce membre n'existe pas.\n");
+	}
+	return membres;
+}
+
+/*
+
+*/
+liste_membres supprimerMembre(liste_membres liste)
+{
+	if (liste == NULL) {
+		return ECHEC;
+	}
+	char numero_membre[TAILLE_L];
+	int status_numerique = ECHEC, status_recherche=ECHEC;
+	while (status_numerique == ECHEC) {
+		printf("Saisissez le numéro du membre a supprimer : ");
+		fgets(numero_membre, sizeof numero_membre, stdin);
+		enleverCaracteresRestants(numero_membre);
+		status_numerique = estNumerique(numero_membre);
+		if (status_numerique == ECHEC) {
+			printf("Le numéro du membre ne doit contenir que des chiffres. Veuillez le retaper s'il vous plait.\n\n");
+		}
+		else {
+			status_numerique = SUCCES;
+		}
+	}
+	liste_membres avant_dernier=liste;
+	liste_membres temporaire=liste;
+	while(temporaire != NULL) {
+			printf("%s = %s\n", numero_membre, temporaire->numero_membre);
+		if (strcmp(numero_membre, temporaire->numero_membre) == SUCCES) {
+			printf("%s = %s\n", numero_membre, temporaire->numero_membre);
+			status_recherche = SUCCES;
+			avant_dernier->suivant = temporaire->suivant;
+			free(temporaire);
+			break;
+		}
+		else {
+			avant_dernier = temporaire;
+			temporaire = temporaire->suivant;
+		}
+	}
+	if (status_recherche == SUCCES) {
+		printf("Membre supprime avec succes.\n");
+	}
+	else {
+		printf("Ce membre n'existe pas.\n");
+	}
+	return liste;
+}
+
+
+
+
 
 /**********************************************************************
 *     Définition des fonctions "supplémentaires" de l'application     *
@@ -785,4 +938,18 @@ int verifierSortie(char* chaine)
 void afficherMessageSortie()
 {
 	printf("\nVous avez choisi de quitter l'application. Merci de l'avoir utilisee.\n");
+}
+
+int comparer2chaines(char* chaine1, char* chaine2)
+{
+	int i, taille1=strlen(chaine1), taille2=strlen(chaine2);
+	if (taille1 != taille2)	{
+		return ECHEC;
+	}
+	for (i=0; i<taille1; i++) {
+		if (chaine1[i] != chaine2[i]) {
+			return ECHEC;
+		}
+	}
+	return SUCCES;
 }
