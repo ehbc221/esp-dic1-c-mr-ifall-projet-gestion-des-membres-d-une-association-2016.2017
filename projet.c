@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -49,7 +50,7 @@ int estAlphabetique(char *chaine);
 int estNumerique(char *chaine);
 void enleverCaracteresRestants(char *chaine);
 void enleverCaracteresSuperflus(void);
-int comparer2chaines(char* chaine1, char* chaine2);
+void clearScreen();
 
 
 
@@ -189,6 +190,7 @@ void afficherListeMembres(liste_membres liste)
 {
 	membre* temporaire = liste;
 	if(temporaire != NULL) {
+		printf("\n");
 		while(temporaire->suivant != NULL) {
 			printf("%s:%s:%s:%s", temporaire->numero_membre, temporaire->nom_membre, temporaire->prenoms_membre, temporaire->adresse_membre);
 			temporaire = temporaire->suivant;
@@ -196,7 +198,7 @@ void afficherListeMembres(liste_membres liste)
 		printf("%s:%s:%s:%s\n", temporaire->numero_membre, temporaire->nom_membre, temporaire->prenoms_membre, temporaire->adresse_membre);
 	}
 	else {
-		printf("Cette liste est vide.\n");
+		printf("\nCette liste est vide.\n");
 	}
 }
 
@@ -245,10 +247,11 @@ void afficherMessageSortie();
 
 int main(int argc, char const *argv[])
 {
-	int sortie=0, status_connection=ECHEC, status_recherche=ECHEC, choix_menu=0;
+	int sortir_app=ECHEC, status_connection=ECHEC, status_recherche=ECHEC, choix_menu=0;
+	char choix_sortie[TAILLE_L];
 	// On affiche l'entete (accueil) de l'application
 	afficherIntitule();
-	// ONn demande à l'utilisareur de se connecter tant qu'il n'a pas choisi de quitter, ou qu'il ne s'est pas connecté
+	// On demande à l'utilisareur de se connecter tant qu'il n'a pas choisi de quitter, ou qu'il ne s'est pas connecté
 	do {
 		// On demande à l'utilisateur de se connecter
 		status_connection = connection();
@@ -261,37 +264,57 @@ int main(int argc, char const *argv[])
 			return SUCCES;
 		}
 	} while (status_connection != SUCCES);
-	// Une fois l'utilisateur connecté, on lui affiche le menu de l'application et lui demande de choisir une option
-	choix_menu = afficherEtChoisirOptionsMenu();
-	/*
-		S'il a choisi de quitter l'application, on lui affiche un message de sortie puis on arrete le programme
-		Sinon, on continue
-	*/
-	if (choix_menu == QUITTER) {
-		afficherMessageSortie();
-		return SUCCES;
-	}
-	// On affiche l'entete de l'option choisie
-	afficherEnteteOptionChoisie(choix_menu);
 	// On déclare et initialise la liste des membres
 	liste_membres membres;
 	membres = creerMembre();
 	// On charge les membres depuis le fichier vers une liste chainée
 	membres = chargerListeMembres();
-	// Affichage de la liste des membres (vide)
-	afficherListeMembres(membres);
-	// Ajouter un nouveau membre à la liste
-	//membres = insererNouveauMembre(membres);
-	// Affichage de la liste des membres (vide)
-	//afficherListeMembres(membres);
-	// Rechercher un membre
-	// status_recherche = rechercherMembre(membres);
-	//membres = modifierMembre(membres);
-	// Affichage de la liste des membres (vide)
-	//afficherListeMembres(membres);
-	membres = supprimerMembre(membres);
-	// Affichage de la liste des membres (vide)
-	afficherListeMembres(membres);
+	do {
+		// Nettoyer l'écran (effacer tout le contenu)
+		clearScreen();
+		// Une fois l'utilisateur connecté, on lui affiche le menu de l'application et lui demande de choisir une option
+		choix_menu = afficherEtChoisirOptionsMenu();
+		// S'il a choisi de quitter l'application, on lui affiche un message de sortie puis on arrete le programme. Sinon, on continue
+		if (choix_menu == QUITTER) {
+			afficherMessageSortie();
+			return SUCCES;
+		}
+		// Nettoyer l'écran (effacer tout le contenu)
+		clearScreen();
+		// On affiche l'entete de l'option choisie
+		afficherEnteteOptionChoisie(choix_menu);
+		switch (choix_menu) {
+			case 1 :
+				// Ajouter un nouveau membre à la liste
+				membres = insererNouveauMembre(membres);
+				break;
+			case 2 :
+				// Rechercher un membre
+				status_recherche = rechercherMembre(membres);
+				break;
+			case 3 :
+				// Modifier un membre
+				membres = modifierMembre(membres);
+				break;
+			case 4 :
+				// Supprimer un membre
+				membres = supprimerMembre(membres);
+				break;
+			default :
+				sortir_app = SUCCES;
+				afficherMessageSortie();
+				return sortir_app;
+		}
+		afficherListeMembres(membres);
+		printf("\nTapez 'quitter' pour sortir de l'application, ou toute autre phrase pour revenir au menu : ");
+		fgets(choix_sortie, sizeof choix_sortie, stdin);
+		enleverCaracteresRestants(choix_sortie);
+		sortir_app = verifierSortie(choix_sortie);
+		if (sortir_app == QUITTER) {
+			sortir_app = SUCCES;
+			return sortir_app;
+		}
+	} while (sortir_app == ECHEC); // Tant que l'utilisateur n'a pas choisi de quitter
 	return SUCCES;
 }
 
@@ -653,7 +676,6 @@ int rechercherMembre(liste_membres liste)
 	while(temporaire != NULL) {
 		if (strcmp(numero_membre, temporaire->numero_membre) == SUCCES) {
 			status_recherche = SUCCES;
-			temporaire = temporaire->suivant;
 			break;
 		}
 		temporaire = temporaire->suivant;
@@ -662,7 +684,7 @@ int rechercherMembre(liste_membres liste)
 		afficherMembre(temporaire);
 	}
 	else {
-		printf("Ce membre n'existe pas.\n");
+		printf("\nCe membre n'existe pas.\n");
 	}
 	return status_recherche;
 }
@@ -677,10 +699,11 @@ int rechercherMembre(liste_membres liste)
 void afficherMembre(liste_membres liste)
 {
 	if (liste != NULL) {
-		printf("Membre numero %s :\n", liste->numero_membre);
+		printf("\nVoici le membre que vous recherchiez :\n");
+		printf("\tNumero %s :\n", liste->numero_membre);
 		printf("\tNom : %s\n", liste->nom_membre);
-		printf("\tNom : %s\n", liste->prenoms_membre);
-		printf("\tNom : %s\n", liste->adresse_membre);
+		printf("\tPrenom(s) : %s\n", liste->prenoms_membre);
+		printf("\tAdresse : %s\n", liste->adresse_membre);
 	}
 }
 
@@ -782,17 +805,26 @@ liste_membres supprimerMembre(liste_membres liste)
 			status_numerique = SUCCES;
 		}
 	}
-	liste_membres avant_dernier=liste;
 	liste_membres temporaire=liste;
+	liste_membres avant_dernier=liste;
+	// On parcours tous les éléments de la liste
 	while(temporaire != NULL) {
-			printf("%s = %s\n", numero_membre, temporaire->numero_membre);
-		if (strcmp(numero_membre, temporaire->numero_membre) == SUCCES) {
-			printf("%s = %s\n", numero_membre, temporaire->numero_membre);
+		// Si c'est le premier element de la liste qui coincide => algo supprimer premier
+		if (temporaire == liste && strcmp(numero_membre, temporaire->numero_membre) == 0) {
+			printf("1\n");
+			status_recherche = SUCCES;
+			liste = temporaire->suivant;
+			free(temporaire);
+			break;
+		}
+		// Sinon si c'est un autre membre qui coincide => algo supprimer membre quelconque
+		else if (strcmp(numero_membre, temporaire->numero_membre) == 0) {
 			status_recherche = SUCCES;
 			avant_dernier->suivant = temporaire->suivant;
 			free(temporaire);
 			break;
 		}
+		// Sinon (les membres ne coincident pas)
 		else {
 			avant_dernier = temporaire;
 			temporaire = temporaire->suivant;
@@ -940,16 +972,8 @@ void afficherMessageSortie()
 	printf("\nVous avez choisi de quitter l'application. Merci de l'avoir utilisee.\n");
 }
 
-int comparer2chaines(char* chaine1, char* chaine2)
+void clearScreen()
 {
-	int i, taille1=strlen(chaine1), taille2=strlen(chaine2);
-	if (taille1 != taille2)	{
-		return ECHEC;
-	}
-	for (i=0; i<taille1; i++) {
-		if (chaine1[i] != chaine2[i]) {
-			return ECHEC;
-		}
-	}
-	return SUCCES;
+	const char *CLEAR_SCREEN_ANSI = "\e[1;1H\e[2J";
+	write(STDOUT_FILENO, CLEAR_SCREEN_ANSI, 12);
 }
