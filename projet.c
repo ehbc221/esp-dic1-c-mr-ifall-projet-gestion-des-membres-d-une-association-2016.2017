@@ -154,6 +154,8 @@ int main()
 {
 	int sortir_app=ECHEC, status_connection=ECHEC, status_recherche=ECHEC, choix_menu=0;
 	char choix_sortie[TAILLE_L];
+	// Nettoyer l'écran (effacer tout le contenu)
+	clearScreen();
 	// On affiche l'entete (accueil) de l'application
 	afficherIntitule();
 	// On demande à l'utilisareur de se connecter tant qu'il n'a pas choisi de quitter, ou qu'il ne s'est pas connecté
@@ -176,7 +178,7 @@ int main()
 	liste = chargerListeMembres();
 	do {
 		// Nettoyer l'écran (effacer tout le contenu)
-		// clearScreen();
+		clearScreen();
 		afficherListeMembres(liste);
 		// Une fois l'utilisateur connecté, on lui affiche le menu de l'application et lui demande de choisir une option
 		choix_menu = afficherEtChoisirOptionsMenu();
@@ -189,7 +191,7 @@ int main()
 			return sortir_app;
 		}
 		// Nettoyer l'écran (effacer tout le contenu)
-		// clearScreen();
+		clearScreen();
 		afficherListeMembres(liste);
 		// On affiche l'entete de l'option choisie
 		afficherEnteteOptionChoisie(choix_menu);

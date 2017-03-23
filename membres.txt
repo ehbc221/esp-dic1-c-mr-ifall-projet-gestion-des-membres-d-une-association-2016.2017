@@ -1,5 +1,6 @@
-1:cisse:babacar:mariste
-2:kane:soukeyna:mariste
-3:test:test:test
-4:test:test:test
-5:ok:ok:ok
+1:NomA:Prenoms A:Adresse de A
+2:NomB:Prenoms B:Adresse de B
+3:NomC:Prenoms C:Adresse de C
+4:NomD:Prenoms D:Adresse de D
+5:NomE:Prenoms E:Adresse de E
+6:NomF:Prenoms F:Adresse de F
