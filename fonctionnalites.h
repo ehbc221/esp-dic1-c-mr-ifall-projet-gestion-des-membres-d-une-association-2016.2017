@@ -19,9 +19,5 @@ void rechercherMembre(liste_membres liste);
 liste_membres modifierMembre(liste_membres liste);
 // Supprimer un membre ( de la liste des membres )
 liste_membres supprimerMembre(liste_membres liste);
-// Vérifier si une chaine de caractères est égale "quitter" ou non (prise en compte de la casse)
-int verifierSortie(char* chaine);
-// Afficher un message après avoir choisi de quitter l'application
-void afficherMessageSortie();
 // Enregistrer la liste des membres ( depuis la liste chaînée liste_membres vers le fichier fichier_membres.txt )
 void enregistrerListeMembres(liste_membres liste);

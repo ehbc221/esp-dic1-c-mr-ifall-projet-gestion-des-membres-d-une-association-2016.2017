@@ -32,7 +32,7 @@ void afficherIntitule()
 int connection()
 {
     char login_saisi[TAILLE_XL], mot_de_passe_saisi[TAILLE_XL], ligne_utilisateur[TAILLE_MAX_LIGNE_FICHIER_MEMBRES], delimiteur[2]=":", *cle, login_temporaire[TAILLE_XL], mot_de_passe_temporaire[TAILLE_XL];
-    int status_connection=ECHEC, indice_cle=0, sortir_app=0;
+    int test=ECHEC, indice_cle=0, sortir_app=ECHEC;
     FILE* fichier_utilisateurs = NULL;
     // On ouvre le fichier contenant les utilisateurs (utilisateurs.txt)
     fichier_utilisateurs = fopen("fichiers/fichier_utilisateurs.txt", "r");
@@ -50,7 +50,7 @@ int connection()
         fgets(mot_de_passe_saisi, sizeof mot_de_passe_saisi, stdin);
         enleverCaracteresRestants(mot_de_passe_saisi);
         // Tant qu'on n'arrive pas à la fin du fichier et que l'on n'a pas trouvé un utilisateur correspondant aux identifiants 
-        while(fgets(ligne_utilisateur, TAILLE_XXL, fichier_utilisateurs) != NULL && status_connection == ECHEC) {
+        while(fgets(ligne_utilisateur, TAILLE_XXL, fichier_utilisateurs) != NULL && test == ECHEC) {
             enleverCaracteresRestants(ligne_utilisateur);
             cle = strtok(ligne_utilisateur, delimiteur);
             indice_cle = 0;
@@ -67,31 +67,31 @@ int connection()
                 cle = strtok(NULL, delimiteur);
             }
             if (strcmp(login_temporaire, login_saisi) == 0 && strcmp(mot_de_passe_temporaire, mot_de_passe_saisi) == 0) {
-                status_connection = SUCCES;
+                test = SUCCES;
             }
         }
-        if (status_connection == ERREUR) {
+        if (test == ERREUR) {
             printf("\nUne erreur est survenue lors de la connection. Merci de reessayer plutard.\n");
         }
-        else if (status_connection == ECHEC) {
+        else if (test == ECHEC) {
             printf("\nAucun utilisateur ne correspond aux identifiants saisis. Veuillez reessayer s'il vous plait.\n");
         }
-        else if (status_connection == SUCCES) {
+        else if (test == SUCCES) {
             printf("\nAuthentification reussie.\n");
         }
     }
     // Si l'ouverture ne s'est pas bien déroulée, on retourne un code d'érreur (-1)
     else {
-        return status_connection = ERREUR;
+        return test = ERREUR;
     }
     fclose(fichier_utilisateurs);
-    return status_connection;
+    return test;
 }
 // Afficher le menu de l'application sélectionner une option
 int afficherEtChoisirOptionsMenu()
 {
     char choix[10], choix_possibles[5][8]={"1", "2", "3", "4", "quitter"};
-    int i, choix_valide=0;
+    int i, test=ECHEC;
     printf("\n /------------\\\n");
     printf("|     Menu     |");
     printf("\n \\------------/\n\n");
@@ -100,7 +100,7 @@ int afficherEtChoisirOptionsMenu()
     printf("3) Modifier un membre.\n");
     printf("4) Supprimer un membre.\n");
     // Demander à l'utilisateur de choisir un numero tant son choix n'est pas valide
-    do {
+    while (test == ECHEC) {
         printf("\nSaisissez le numero de votre choix pour continuer (ou tapez 'quitter' pour sortir de l'application) : ");
         fgets(choix, sizeof choix, stdin);
         enleverCaracteresRestants(choix);
@@ -108,9 +108,9 @@ int afficherEtChoisirOptionsMenu()
             printf("\nChoix incorrect. Veuillez le ressaisir s'il vous plait.\n");
         }
         else {
-            choix_valide = 1;
+            test = SUCCES;
         }
-    } while (choix_valide == 0);
+    }
     // Si le choix est 1, 2, 3, ou 4 (par rapport au menu), retourner ce numero
     for (i=0; i<4; i++) {
         if (strcmp(choix, choix_possibles[i]) == 0) {
@@ -149,7 +149,7 @@ void afficherEnteteOptionChoisie(int numero_option)
 // Charger la liste des membres ( depuis le fichier fichier_membres.txt vers une liste chaînée liste_membres )
 liste_membres chargerListeMembres()
 {
-    int status_chargement=ECHEC, indice_cle=0;
+    int indice_cle=0;
     char numero_membre[TAILLE_L], nom_membre[TAILLE_XL], prenoms_membre[TAILLE_XL], adresse_membre[TAILLE_XXL], code_formation[TAILLE_L], intitule_formation[TAILLE_L], annee_formation[TAILLE_L], ligne_membre[TAILLE_MAX_LIGNE_FICHIER_MEMBRES], delimiteur[2]=":", *cle;
     // Création d'une nouvelle liste de membres
     liste_membres liste_membres_temporaire = creerListeMembre();
@@ -214,83 +214,73 @@ liste_membres chargerListeMembres()
 liste_membres insererNouveauMembre(liste_membres liste)
 {
     char numero_membre[TAILLE_L], nom_membre[TAILLE_XL], prenoms_membre[TAILLE_XL], adresse_membre[TAILLE_XXL], code_formation[TAILLE_L], intitule_formation[TAILLE_L], annee_formation[TAILLE_L], nombre_formations[TAILLE_L];
-    int status_recherche=SUCCES, status_ajout=ECHEC, status_alpha_numerique=ECHEC, status_alphabetique=ECHEC, status_numerique=ECHEC, status_fermeture=ECHEC, status_annee=ECHEC;
+    int test1=SUCCES, test2=ECHEC;
     long i=0, compteur=0;
     liste_membres liste_membres_temporaire=liste;
     liste_formations liste_formations_temporaire = creerListeFormation();
-    while (status_numerique == ECHEC || status_recherche == SUCCES) {
+    while (test2 == ECHEC || test1 == SUCCES) {
         liste_membres_temporaire = liste;
-        printf("Saisissez le numero du membre a ajouter : ");
+        printf("\nNumero du membre a ajouter : ");
         fgets(numero_membre, sizeof numero_membre, stdin);
         enleverCaracteresRestants(numero_membre);
-        status_numerique = estNumerique(numero_membre);
-        if (status_numerique == ECHEC) {
-            printf("Le numero du membre ne doit contenir que des chiffres. Veuillez le retaper s'il vous plait.\n\n");
+        test2 = estNumerique(numero_membre);
+        if (test2 == ECHEC) {
+            printf("\nLe numero du membre ne doit contenir que des chiffres. Veuillez le retaper s'il vous plait.\n");
         }
         // On cherche s'il n'y a pas un membre avec le meme numero
         while(liste_membres_temporaire != NULL) {
             if (strcmp(numero_membre, liste_membres_temporaire->numero_membre) == 0) {
-                status_recherche = SUCCES;
+                test1 = SUCCES;
                 break;
             }
             else {
-                status_recherche = ECHEC;
+                test1 = ECHEC;
                 liste_membres_temporaire = liste_membres_temporaire->suivant;
             }
         }
-        if (status_recherche == SUCCES) {
-            printf("\nCe numero de membre existe deja. Veuillez en retaper un autre.\n\n");
+        if (test1 == SUCCES) {
+            printf("\nCe numero de membre existe deja. Veuillez en retaper un autre.\n");
         }
     }
+    test1 = ECHEC;
     liste_membres_temporaire = liste;
-    while (status_alphabetique == ECHEC) {
-        printf("Saisissez le nom du membre : ");
+    while (test1 == ECHEC) {
+        printf("\nNom du membre : ");
         fgets(nom_membre, sizeof nom_membre, stdin);
         enleverCaracteresRestants(nom_membre);
-        status_alphabetique = estAlphabetique(nom_membre);
-        if (status_alphabetique == ECHEC) {
-            printf("Le nom du membre ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n\n");
-        }
-        else {
-            status_alphabetique = SUCCES;
+        test1 = estAlphabetique(nom_membre);
+        if (test1 == ECHEC) {
+            printf("\nLe nom du membre ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n");
         }
     }
-    status_alphabetique = ECHEC;
-    while (status_alphabetique == ECHEC) {
-        printf("Saisissez le prénom du membre : ");
+    test1 = ECHEC;
+    while (test1 == ECHEC) {
+        printf("\nPrénom(s) du membre : ");
         fgets(prenoms_membre, sizeof prenoms_membre, stdin);
         enleverCaracteresRestants(prenoms_membre);
-        status_alphabetique = estAlphabetique(prenoms_membre);
-        if (status_alphabetique == ECHEC) {
-            printf("Le prénom du membre ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n\n");
-        }
-        else {
-            status_alphabetique = SUCCES;
+        test1 = estAlphabetique(prenoms_membre);
+        if (test1 == ECHEC) {
+            printf("\nLe prénom du membre ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n");
         }
     }
-    while (status_alpha_numerique == ECHEC) {
-        printf("Saisissez l'adresse du membre : ");
+    test1 = ECHEC;
+    while (test1 == ECHEC) {
+        printf("\nAdresse du membre : ");
         fgets(adresse_membre, sizeof adresse_membre, stdin);
         enleverCaracteresRestants(adresse_membre);
-        status_alpha_numerique = estAlphaNumerique(adresse_membre);
-        if (status_alpha_numerique == ECHEC) {
-            printf("L'adresse du membre ne doit contenir que des lettres alphabetiques, des chiffres, et espaces. Veuillez le retaper s'il vous plait.\n\n");
-        }
-        else {
-            status_alpha_numerique = SUCCES;
+        test1 = estAlphaNumerique(adresse_membre);
+        if (test1 == ECHEC) {
+            printf("\nL'adresse du membre ne doit contenir que des lettres alphabetiques, des chiffres, et espaces. Veuillez le retaper s'il vous plait.\n");
         }
     }
-    status_numerique = ECHEC;
-    while (status_numerique == ECHEC) {
-        printf("Donnez le nombre de formations du membre : ");
+    test1 = ECHEC;
+    while (test1 == ECHEC) {
+        printf("\nDonnez le nombre de formations du membre : ");
         fgets(nombre_formations, sizeof nombre_formations, stdin);
         enleverCaracteresRestants(nombre_formations);
-        status_numerique = estNumerique(nombre_formations);
-        if (status_numerique == ECHEC) {
-            printf("Ce numero de membre est invalide. Veuillez le retaper s'il vous plait.\n\n");
-        }
-        else {
-            status_numerique = SUCCES;
+        test1 = estNumerique(nombre_formations);
+        if (test1 == ECHEC) {
+            printf("\nNombre de formations invalide. Veuillez le retaper s'il vous plait.\n");
         }
     }
     compteur = strtol(nombre_formations, NULL, 10);
@@ -299,43 +289,34 @@ liste_membres insererNouveauMembre(liste_membres liste)
     }
     else {
         for (i=0; i<compteur; i++) {
-            status_alphabetique = ECHEC;
-            while (status_alphabetique == ECHEC) {
-                printf("\nSaisissez le code de la formation : ");
+            test1 = ECHEC;
+            while (test1 == ECHEC) {
+                printf("\n\n\tCode de la formation %ld: ", i+1);
                 fgets(code_formation, sizeof code_formation, stdin);
                 enleverCaracteresRestants(code_formation);
-                status_alphabetique = estAlphaNumerique(code_formation);
-                if (status_alphabetique == ECHEC) {
-                    printf("Le code de la formation ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n\n");
-                }
-                else {
-                    status_alphabetique = SUCCES;
+                test1 = estAlphaNumerique(code_formation);
+                if (test1 == ECHEC) {
+                    printf("\n\tLe code de la formation ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n");
                 }
             }
-            status_alphabetique = ECHEC;
-            while (status_alphabetique == ECHEC) {
-                printf("Saisissez l'intitule de la formation : ");
+            test1 = ECHEC;
+            while (test1 == ECHEC) {
+                printf("\n\tIntitule de la formation %ld: ", i+1);
                 fgets(intitule_formation, sizeof intitule_formation, stdin);
                 enleverCaracteresRestants(intitule_formation);
-                status_alphabetique = estAlphaNumerique(intitule_formation);
-                if (status_alphabetique == ECHEC) {
-                    printf("L'intitule de la formation ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n\n");
-                }
-                else {
-                    status_alphabetique = SUCCES;
+                test1 = estAlphaNumerique(intitule_formation);
+                if (test1 == ECHEC) {
+                    printf("\n\tL'intitule de la formation ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n");
                 }
             }
-            status_annee = ECHEC;
-            while (status_annee == ECHEC) {
-                printf("Saisissez l'annee de la formation (AAAA/AAAA): ");
+            test1 = ECHEC;
+            while (test1 == ECHEC) {
+                printf("\n\tAnnee de la formation %ld (AAAA/AAAA) : ", i+1);
                 fgets(annee_formation, sizeof annee_formation, stdin);
                 enleverCaracteresRestants(annee_formation);
-                status_annee = estAnneeScolaireValide(annee_formation);
-                if (status_annee == ECHEC) {
-                    printf("L'annee de la formation doit respecter le format donne (Ex: 2016/2017). Veuillez la retaper s'il vous plait.\n\n");
-                }
-                else {
-                    status_annee = SUCCES;
+                test1 = estAnneeScolaireValide(annee_formation);
+                if (test1 == ECHEC) {
+                    printf("\n\tL'annee de la formation doit respecter le format donne (Ex: 2016/2017). Veuillez la retaper s'il vous plait.\n");
                 }
             }
             liste_formations_temporaire = insererEnQueueFormation(liste_formations_temporaire, code_formation, intitule_formation, annee_formation);
@@ -352,21 +333,21 @@ void rechercherMembre(liste_membres liste)
 {
     if (liste != NULL) {
         char numero_membre[TAILLE_L];
-        int status_numerique = ECHEC, status_recherche=ECHEC;
-        while (status_numerique == ECHEC) {
-            printf("Saisissez le numero du membre a rechercher : ");
+        int test=ECHEC;
+        while (test == ECHEC) {
+            printf("\nSaisissez le numero du membre que vous recherchez : ");
             fgets(numero_membre, sizeof numero_membre, stdin);
             enleverCaracteresRestants(numero_membre);
-            status_numerique = estNumerique(numero_membre);
-            if (status_numerique == ECHEC) {
-                printf("Ce numero de membre est invalide. Veuillez le retaper s'il vous plait.\n\n");
+            test = estNumerique(numero_membre);
+            if (test == ECHEC) {
+                printf("\nCe numero de membre est invalide. Veuillez le retaper s'il vous plait.\n");
             }
             else {
-                status_numerique = SUCCES;
+                test = SUCCES;
             }
         }
-        status_recherche = rechercherUnMembre(liste, numero_membre);
-        if (status_recherche == SUCCES) {
+        test = rechercherUnMembre(liste, numero_membre);
+        if (test == SUCCES) {
             printf("\nVoici le membre que vous recherchiez :\n");
             afficherUnMembre(liste, numero_membre);
         }
@@ -381,79 +362,220 @@ void rechercherMembre(liste_membres liste)
 // Modifier un membre ( de la liste des membres )
 liste_membres modifierMembre(liste_membres membres)
 {
-    if (membres == NULL)
-        return ECHEC;
-    char numero_membre[TAILLE_L];
-    int status_recherche=ECHEC, status_alpha_numerique=ECHEC, status_alphabetique=ECHEC, status_numerique=ECHEC, status_fermeture=ECHEC;
-    while (status_numerique == ECHEC) {
-        printf("Saisissez le numero du membre a modifier : ");
+    if (membres == NULL) {
+        printf("\nAucun membre a afficher. La liste des membres est vide.\n");
+        return NULL;
+    }
+    char choix[TAILLE_L], numero_membre[TAILLE_L], code_formation[TAILLE_L], intitule_formation[TAILLE_L], annee_formation[TAILLE_L];
+    int test=ECHEC, trouve=ECHEC;
+    long compteur=0;
+    while (test == ECHEC) {
+        printf("\nSaisissez le numero du membre a modifier : ");
         fgets(numero_membre, sizeof numero_membre, stdin);
         enleverCaracteresRestants(numero_membre);
-        status_numerique = estNumerique(numero_membre);
-        if (status_numerique == ECHEC) {
-            printf("Le numero du membre ne doit contenir que des chiffres. Veuillez le retaper s'il vous plait.\n\n");
-        }
-        else {
-            status_numerique = SUCCES;
+        test = estNumerique(numero_membre);
+        if (test == ECHEC) {
+            printf("\nLe numero du membre ne doit contenir que des chiffres. Veuillez le retaper s'il vous plait.\n");
         }
     }
-    liste_membres temporaire=membres;
-    while(temporaire != NULL) {
-        if (strcmp(numero_membre, temporaire->numero_membre) == 0) {
-            status_recherche = SUCCES;
+    test = ECHEC;
+    liste_membres liste_membres_temporaire=membres;
+    while(liste_membres_temporaire != NULL) {
+        if (strcmp(numero_membre, liste_membres_temporaire->numero_membre) == 0) {
+            test = SUCCES;
             break;
         }
-        temporaire = temporaire->suivant;
+        liste_membres_temporaire = liste_membres_temporaire->suivant;
     }
-    if (status_recherche == SUCCES) {
+    if (test == SUCCES) {
         printf("\nVoici le membre que vous allez modifier :\n");
-        printf("\tNumero %s :\n", temporaire->numero_membre);
-        printf("\tNom : %s\n", temporaire->nom_membre);
-        printf("\tPrenom(s) : %s\n", temporaire->prenoms_membre);
-        printf("\tAdresse : %s\n\n", temporaire->adresse_membre);
-        while (status_alphabetique == ECHEC) {
-            printf("Saisissez le nom du membre : ");
-            fgets(temporaire->nom_membre, sizeof temporaire->nom_membre, stdin);
-            enleverCaracteresRestants(temporaire->nom_membre);
-            status_alphabetique = estAlphabetique(temporaire->nom_membre);
-            if (status_alphabetique == ECHEC) {
-                printf("Le nom du membre ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n\n");
-            }
-            else {
-                status_alphabetique = SUCCES;
+        afficherUnMembre(membres, numero_membre);
+        test = ECHEC;
+        while (test == ECHEC) {
+            printf("\nNouveau nom du membre : ");
+            fgets(liste_membres_temporaire->nom_membre, sizeof liste_membres_temporaire->nom_membre, stdin);
+            enleverCaracteresRestants(liste_membres_temporaire->nom_membre);
+            test = estAlphabetique(liste_membres_temporaire->nom_membre);
+            if (test == ECHEC) {
+                printf("\nLe nom du membre ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n\n");
             }
         }
-        status_alphabetique = ECHEC;
-        while (status_alphabetique == ECHEC) {
-            printf("Saisissez le prénom du membre : ");
-            fgets(temporaire->prenoms_membre, sizeof temporaire->prenoms_membre, stdin);
-            enleverCaracteresRestants(temporaire->prenoms_membre);
-            status_alphabetique = estAlphabetique(temporaire->prenoms_membre);
-            if (status_alphabetique == ECHEC) {
-                printf("Le prénom du membre ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n\n");
-            }
-            else {
-                status_alphabetique = SUCCES;
+        test = ECHEC;
+        while (test == ECHEC) {
+            printf("\nNouveau prénom du membre : ");
+            fgets(liste_membres_temporaire->prenoms_membre, sizeof liste_membres_temporaire->prenoms_membre, stdin);
+            enleverCaracteresRestants(liste_membres_temporaire->prenoms_membre);
+            test = estAlphabetique(liste_membres_temporaire->prenoms_membre);
+            if (test == ECHEC) {
+                printf("\nLe prénom du membre ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n\n");
             }
         }
-        while (status_alpha_numerique == ECHEC) {
-            printf("Saisissez l'adresse du membre : ");
-            fgets(temporaire->adresse_membre, sizeof temporaire->adresse_membre, stdin);
-            enleverCaracteresRestants(temporaire->adresse_membre);
-            status_alpha_numerique = estAlphaNumerique(temporaire->adresse_membre);
-            if (status_alpha_numerique == ECHEC) {
-                printf("L'adresse du membre ne doit contenir que des lettres alphabetiques, des chiffres, et espaces. Veuillez le retaper s'il vous plait.\n\n");
-            }
-            else {
-                status_alpha_numerique = SUCCES;
+        test = ECHEC;
+        while (test == ECHEC) {
+            printf("\nNouvelle adresse du membre : ");
+            fgets(liste_membres_temporaire->adresse_membre, sizeof liste_membres_temporaire->adresse_membre, stdin);
+            enleverCaracteresRestants(liste_membres_temporaire->adresse_membre);
+            test = estAlphaNumerique(liste_membres_temporaire->adresse_membre);
+            if (test == ECHEC) {
+                printf("\nL'adresse du membre ne doit contenir que des lettres alphabetiques, des chiffres, et espaces. Veuillez le retaper s'il vous plait.\n\n");
             }
         }
-        printf("\nVoici les nouvelle informations du membre :\n");
-        printf("\tNumero %s :\n", temporaire->numero_membre);
-        printf("\tNom : %s\n", temporaire->nom_membre);
-        printf("\tPrenom(s) : %s\n", temporaire->prenoms_membre);
-        printf("\tAdresse : %s\n\n", temporaire->adresse_membre);
-        printf("Membre modifie avec succes.\n");
+        printf("\nFormations :\n");
+        printf("\n\t1) Aucune modification a faire :\n");
+        printf("\t2) Ajouter une formation\n");
+        printf("\t3) Modifier une formation\n");
+        printf("\t4) Supprimer une formation\n");
+        test = ECHEC;
+        while (test == ECHEC) {
+            printf("\n\tSaisissez le numero de votre choix : ");
+            fgets(choix, sizeof choix, stdin);
+            enleverCaracteresRestants(choix);
+            test = estNumerique(choix);
+            if (test == ECHEC) {
+                printf("\nLe choix doit etre numerique. Veuillez le ressaisir s'il vous plait.\n");
+            }
+            else {
+                if (strcmp(choix, "1") != 0 && strcmp(choix, "2") != 0 && strcmp(choix, "3") != 0 && strcmp(choix, "4") != 0) {
+                    test = ECHEC;
+                    printf("\nCe choix n'appartient pas aux 4 disponibles. Veuillez le ressaisir s'il vous plait.\n");
+                }
+            }
+        }
+        compteur = strtol(choix, NULL, 10);
+        if (compteur == 1) {
+            printf("\nAucune modification a apporter.\n");
+        }
+        else if (compteur == 2) {
+            test = ECHEC;
+            while (test == ECHEC) {
+                printf("\n\tCode de la formation : ");
+                fgets(code_formation, sizeof code_formation, stdin);
+                enleverCaracteresRestants(code_formation);
+                test = estAlphaNumerique(code_formation);
+                if (test == ECHEC) {
+                    printf("\n\tLe code de la formation ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n");
+                }
+            }
+            test = ECHEC;
+            while (test == ECHEC) {
+                printf("\n\tIntitule de la formation : ");
+                fgets(intitule_formation, sizeof intitule_formation, stdin);
+                enleverCaracteresRestants(intitule_formation);
+                test = estAlphaNumerique(intitule_formation);
+                if (test == ECHEC) {
+                    printf("\n\tL'intitule de la formation ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n");
+                }
+            }
+            test = ECHEC;
+            while (test == ECHEC) {
+                printf("\n\tAnnee de la formation (AAAA/AAAA) : ");
+                fgets(annee_formation, sizeof annee_formation, stdin);
+                enleverCaracteresRestants(annee_formation);
+                test = estAnneeScolaireValide(annee_formation);
+                if (test == ECHEC) {
+                    printf("\n\tL'annee de la formation doit respecter le format donne (Ex: 2016/2017). Veuillez la retaper s'il vous plait.\n");
+                }
+            }
+            liste_membres_temporaire->formations_membre = insererEnQueueFormation(liste_membres_temporaire->formations_membre, code_formation, intitule_formation, annee_formation);
+            printf("\nFormation ajoute avec succes.\n");
+        }
+        else if (compteur == 3) {
+            liste_formations liste_formations_temporaire = liste_membres_temporaire->formations_membre;
+            if (liste_formations_temporaire ==  NULL) {
+                printf("\nAucune formation a modifier.\n");
+            }
+            else {
+                test = ECHEC;
+                while (test == ECHEC) {
+                    printf("\n\tDonnez le code de la formation a modifier: ");
+                    fgets(code_formation, sizeof code_formation, stdin);
+                    enleverCaracteresRestants(code_formation);
+                    test = estAlphaNumerique(code_formation);
+                    if (test == ECHEC) {
+                        printf("\n\tLe code de la formation ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n");
+                    }
+                }
+                trouve = ECHEC;
+                while (liste_formations_temporaire != NULL) {
+                    if (strcmp(liste_formations_temporaire->code_formation, code_formation) == 0) {
+                        test = ECHEC;
+                        while (test == ECHEC) {
+                            printf("\n\tNouveau code de la formation : ");
+                            fgets(liste_formations_temporaire->code_formation, sizeof liste_formations_temporaire->code_formation, stdin);
+                            enleverCaracteresRestants(liste_formations_temporaire->code_formation);
+                            test = estAlphaNumerique(liste_formations_temporaire->code_formation);
+                            if (test == ECHEC) {
+                                printf("\n\tLe code de la formation ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n");
+                            }
+                        }
+                        test = ECHEC;
+                        while (test == ECHEC) {
+                            printf("\n\tNouvel intitule de la formation : ");
+                            fgets(liste_formations_temporaire->intitule_formation, sizeof liste_formations_temporaire->intitule_formation, stdin);
+                            enleverCaracteresRestants(liste_formations_temporaire->intitule_formation);
+                            test = estAlphaNumerique(liste_formations_temporaire->intitule_formation);
+                            if (test == ECHEC) {
+                                printf("\n\tL'intitule de la formation ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n");
+                            }
+                        }
+                        test = ECHEC;
+                        while (test == ECHEC) {
+                            printf("\n\tNouvelle annee de la formation (AAAA/AAAA) : ");
+                            fgets(liste_formations_temporaire->annee_formation, sizeof liste_formations_temporaire->annee_formation, stdin);
+                            enleverCaracteresRestants(liste_formations_temporaire->annee_formation);
+                            test = estAnneeScolaireValide(liste_formations_temporaire->annee_formation);
+                            if (test == ECHEC) {
+                                printf("\n\tL'annee de la formation doit respecter le format donne (Ex: 2016/2017). Veuillez la retaper s'il vous plait.\n");
+                            }
+                        }
+                        trouve = SUCCES;
+                        break;
+                    }
+                    liste_formations_temporaire = liste_formations_temporaire->suivant;
+                }
+                if (trouve == SUCCES) {
+                    printf("\nFormation modifiee avec succes.\n");
+                }
+                else {
+                    printf("\nAucune formation ne correspond a ce code.");
+                }
+            }
+        }
+        else if (compteur == 4) {
+            liste_formations liste_formations_temporaire = liste_membres_temporaire->formations_membre;
+            liste_formations avant = liste_membres_temporaire->formations_membre;
+            if (liste_formations_temporaire ==  NULL) {
+                printf("\nAucune formation a modifier.\n");
+            }
+            else {
+                test = ECHEC;
+                while (test == ECHEC) {
+                    printf("\n\tDonnez le code de la formation a supprimer: ");
+                    fgets(code_formation, sizeof code_formation, stdin);
+                    enleverCaracteresRestants(code_formation);
+                    test = estAlphaNumerique(code_formation);
+                    if (test == ECHEC) {
+                        printf("\n\tLe code de la formation ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n");
+                    }
+                }
+                test = rechercherUneFormation(liste_formations_temporaire, code_formation);
+                if (test = SUCCES) {
+                    test = supprimerUneFormation(liste_formations_temporaire, code_formation);
+                    if (test == SUCCES) {
+                        printf("\nFormation supprimee avec succes.\n");
+                    }
+                    else {
+                        printf("\nImpossible de supprimer cette formation.\n");
+                    }
+                }
+                else {
+                    printf("\nCe code ne correspond a aucune formation.\n");
+                }
+            }
+        }
+        printf("\nVoici les nouvelles informations du membre :\n");
+        afficherUnMembre(membres, numero_membre);
+        printf("\nMembre modifie avec succes.\n");
     }
     else {
         printf("\nCe membre n'existe pas.\n");
@@ -467,55 +589,32 @@ liste_membres supprimerMembre(liste_membres liste)
         return ECHEC;
     }
     char numero_membre[TAILLE_L];
-    int status_numerique = ECHEC, status_recherche=ECHEC, status_suppression=ECHEC;
-    while (status_numerique == ECHEC) {
-        printf("Saisissez le numero du membre a supprimer : ");
+    int test = ECHEC;
+    while (test == ECHEC) {
+        printf("\nSaisissez le numero du membre a supprimer : ");
         fgets(numero_membre, sizeof numero_membre, stdin);
         enleverCaracteresRestants(numero_membre);
-        status_numerique = estNumerique(numero_membre);
-        if (status_numerique == ECHEC) {
-            printf("Le numero du membre ne doit contenir que des chiffres. Veuillez le retaper s'il vous plait.\n\n");
-        }
-        else {
-            status_numerique = SUCCES;
+        test = estNumerique(numero_membre);
+        if (test == ECHEC) {
+            printf("\nLe numero du membre ne doit contenir que des chiffres. Veuillez le retaper s'il vous plait.\n");
         }
     }
-    status_recherche = rechercherUnMembre(liste, numero_membre);
-    if (status_recherche == SUCCES) {
+    test = rechercherUnMembre(liste, numero_membre);
+    if (test == SUCCES) {
         printf("\nVoici le membre que vous allez supprimer :\n");
         afficherUnMembre(liste, numero_membre);
-        status_suppression = supprimerUnMembre(liste, numero_membre);
-        if (status_suppression == SUCCES) {
+        test = supprimerUnMembre(liste, numero_membre);
+        if (test == SUCCES) {
             printf("\nMembre supprime avec succes.\n");
         }
         else {
-            printf("Impossible de supprimer ce membre.\n");
+            printf("\nImpossible de supprimer ce membre.\n");
         }
     }
     else {
         printf("\nCe membre n'existe pas.\n");
     }
     return liste;
-}
-// Vérifier si une chaine de caractères est égale "quitter" ou non (prise en compte de la casse)
-int verifierSortie(char* chaine)
-{
-    char quitter[8]="quitter";
-    int i, taille_chaine=strlen(chaine);
-    for (i=0; i<taille_chaine; i++) {
-        chaine[i] = tolower(chaine[i]);
-    }
-    if (strcmp(chaine, quitter) == 0) {
-        return QUITTER;
-    }
-    else {
-        return ECHEC;
-    }
-}
-// Afficher un message après avoir choisi de quitter l'application
-void afficherMessageSortie()
-{
-    printf("\nVous avez choisi de quitter l'application. Merci de l'avoir utilisee.\n");
 }
 // Enregistrer la liste des membres ( depuis la liste chaînée liste_membres vers le fichier fichier_membres.txt )
 void enregistrerListeMembres(liste_membres liste) {
@@ -542,7 +641,7 @@ void enregistrerListeMembres(liste_membres liste) {
     }
     // Si l'ouverture ne s'est pas bien déroulée
     else {
-        printf("Une erreur s'est produite lors de l'ouverture du fichier\n");;
+        printf("\nUne erreur s'est produite lors de l'ouverture du fichier\n");;
     }
     // On ferme le fichier qui a été ouvert
     fclose(fichier_membres);

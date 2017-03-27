@@ -42,3 +42,7 @@ liste_formations creerListeFormation();
 liste_formations insererEnQueueFormation(liste_formations ancienne_liste_formations, char *code_formation, char *intitule_formation, char *annee_formation);
 // Afficher la liste des formations
 void afficherListeFormations(liste_formations liste);
+// Rechercher une formation dans une liste
+int rechercherUneFormation(liste_formations liste, char *code_formation);
+// Supprimer une formation
+int supprimerUneFormation(liste_formations liste, char *code_formation);

@@ -14,7 +14,7 @@
 ***********************************************************************/
 int main()
 {
-    int sortir_app=ECHEC, status_connection=ECHEC, status_recherche=ECHEC, choix_menu=0;
+    int sortir_app=ECHEC, test=ECHEC, choix_menu=0;
     char choix_sortie[TAILLE_L];
     // Nettoyer l'écran (effacer tout le contenu)
     clearScreen();
@@ -42,16 +42,16 @@ int main()
     // On demande à l'utilisareur de se connecter tant qu'il n'a pas choisi de quitter, ou qu'il ne s'est pas connecté
     do {
         // On demande à l'utilisateur de se connecter
-        status_connection = connection();
+        test = connection();
         /*
             S'il a choisi de quitter l'application, on lui affiche un message de sortie puis on arrete le programme
             Sinon, on continue
         */
-        if (status_connection == QUITTER) {
+        if (test == QUITTER) {
             afficherMessageSortie();
             return SUCCES;
         }
-    } while (status_connection != SUCCES);
+    } while (test != SUCCES);
     // On déclare et initialise la liste des membres
     liste_membres liste;
     liste = creerListeMembre();

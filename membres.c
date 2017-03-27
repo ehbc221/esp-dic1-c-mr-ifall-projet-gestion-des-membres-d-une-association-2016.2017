@@ -45,17 +45,17 @@ liste_membres insererEnQueueMembre(liste_membres ancienne_liste_membres, char *n
 // Rechercher un membre dans une liste
 int rechercherUnMembre(liste_membres liste, char *numero_membre)
 {
-    int status_recherche=ECHEC;
+    int test=ECHEC;
     liste_membres liste_membres_temporaire=liste;
     while(liste_membres_temporaire != NULL) {
         if (strcmp(numero_membre, liste_membres_temporaire->numero_membre) == 0) {
-            return status_recherche = SUCCES;
+            return test = SUCCES;
         }
         else {
             liste_membres_temporaire = liste_membres_temporaire->suivant;
         }
     }
-    return status_recherche=ECHEC;
+    return test=ECHEC;
 }
 // Afficher un membre
 void afficherUnMembre(liste_membres liste, char *numero_membre)
@@ -91,24 +91,24 @@ void afficherUnMembre(liste_membres liste, char *numero_membre)
 // Supprimer un membre
 int supprimerUnMembre(liste_membres liste, char *numero_membre)
 {
-    int status_suppression=ECHEC;
+    int test=ECHEC;
     liste_membres temporaire=liste;
     liste_membres avant_dernier=liste;
     // On parcours tous les éléments de la liste
-    while(temporaire != NULL && status_suppression == ECHEC) {
+    while(temporaire != NULL && test == ECHEC) {
         // Si on trouve le membre (celui avec le meme numero)
         if (strcmp(numero_membre, temporaire->numero_membre) == 0) {
             // Si c'est le premier element de la liste qui coincide => algo supprimer premier
             if (temporaire == liste && strcmp(numero_membre, temporaire->numero_membre) == 0) {
-                liste = temporaire->suivant;
+                liste = NULL;
                 free(temporaire);
-                return status_suppression = SUCCES;
+                return test = SUCCES;
             }
             // Sinon si c'est un autre membre qui coincide => algo supprimer membre quelconque
             else if (strcmp(numero_membre, temporaire->numero_membre) == 0) {
                 avant_dernier->suivant = temporaire->suivant;
                 free(temporaire);
-                return status_suppression = SUCCES;
+                return test = SUCCES;
             }
         }
         // Sinon (si les membres ne coincident pas)
@@ -117,7 +117,7 @@ int supprimerUnMembre(liste_membres liste, char *numero_membre)
             temporaire = temporaire->suivant;
         }
     }
-    return status_suppression = ECHEC;
+    return test = ECHEC;
 }
 // Afficher la liste des membres
 void afficherListeMembres(liste_membres liste)
@@ -174,4 +174,50 @@ void afficherListeFormations(liste_formations liste)
         }
         printf(":%s:%s:%s", temporaire->code_formation, temporaire->intitule_formation, temporaire->annee_formation);
     }
+}
+// Rechercher une formation dans une liste
+int rechercherUneFormation(liste_formations liste, char *code_formation)
+{
+    int test=ECHEC;
+    liste_formations liste_formations_temporaire=liste;
+    while(liste_formations_temporaire != NULL) {
+        if (strcmp(code_formation, liste_formations_temporaire->code_formation) == 0) {
+            return test = SUCCES;
+        }
+        else {
+            liste_formations_temporaire = liste_formations_temporaire->suivant;
+        }
+    }
+    return test=ECHEC;
+}
+// Supprimer une formation
+int supprimerUneFormation(liste_formations liste, char *code_formation)
+{
+    int test=ECHEC;
+    liste_formations temporaire=liste;
+    liste_formations avant_dernier=liste;
+    // On parcours tous les éléments de la liste
+    while(temporaire != NULL && test == ECHEC) {
+        // Si on trouve le membre (celui avec le meme numero)
+        if (strcmp(code_formation, temporaire->code_formation) == 0) {
+            // Si c'est le premier element de la liste qui coincide => algo supprimer premier
+            if (temporaire == liste && strcmp(code_formation, temporaire->code_formation) == 0) {
+                liste = NULL;
+                free(temporaire);
+                return test = SUCCES;
+            }
+            // Sinon si c'est un autre membre qui coincide => algo supprimer membre quelconque
+            else if (strcmp(code_formation, temporaire->code_formation) == 0) {
+                avant_dernier->suivant = temporaire->suivant;
+                free(temporaire);
+                return test = SUCCES;
+            }
+        }
+        // Sinon (si les membres ne coincident pas)
+        else {
+            avant_dernier = temporaire;
+            temporaire = temporaire->suivant;
+        }
+    }
+    return test = ECHEC;
 }

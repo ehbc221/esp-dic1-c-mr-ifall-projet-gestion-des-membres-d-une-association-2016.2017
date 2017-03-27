@@ -4,5 +4,6 @@
 4:NomD:Prenoms D:Adresse de D
 5:NomE:Prenoms E:Adresse de E
 6:NomF:Prenoms F:Adresse de F
-7:test:test:test
-8:test:test:test:sgdfg:qfsdff:2016/2017:5665qsd:6853sqd:2016/2017
+9:nom:prenoms membre:adresse membre:code:intitule1:2013/2014:code2:intitule2:2014/2015:code3:intitule3:2015/2016
+10:tt:tt:tt:ds:eds:2016/2017:ezdf:zasd:2016/2017:53zqsd:q584s2wxc:2013/2014
+8:zzzzzzzzz:zzzzzzzzz:zzzzzzzz:6852:zzzzz:2016/2017:ZSDF6542:zzzzzzzzzzz:2016/2017
