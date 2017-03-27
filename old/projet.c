@@ -730,7 +730,7 @@ void enleverCaracteresRestants(char *chaine)
     char *p = strchr(chaine, '\n');
     // Si on le trouve, on annule sa valeur
     if (p)
-        *p = 0;
+        *p = '\0';
     // Sinon : cas où la dernière saisie ne s'est pas déroulée correctement (ou on a dépassé le nombre de caractères max spécifié en deuxième argument) alors la seconde saisie va contenir les caractères qui n'ont pas été lus
     else
         enleverCaracteresSuperflus();

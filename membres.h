@@ -1,14 +1,6 @@
 /***********************************************
 * Définition des stuctures et listes chaînées  *
 ************************************************/
-// Structure d'un utilisateur
-typedef struct utilisateur
-{
-    char login_utilisateur[TAILLE_XL];
-    char mot_de_passe_utilisateur[TAILLE_XL];
-    struct utilisateur *suivant;
-} utilisateur;
-typedef utilisateur* liste_utilisateurs;
 // Structure d'un membre
 typedef struct membre
 {
@@ -32,15 +24,21 @@ typedef formation* liste_formations;
 /***********************************************************************
 *     Définition des fonctions relatives aux membres et formations     *
 ***********************************************************************/
-// Créer une liste d'utilisateurs vide
-liste_utilisateurs creerUtilisateur();
-// Ajouter un utilisateur en fin de liste
-liste_utilisateurs insererEnQueueUtilisateur(liste_utilisateurs liste, char* login_utilisateur, char* mot_de_passe_utilisateur);
 // Créer une liste de membres vide
-liste_membres creerMembre();
+liste_membres creerListeMembre();
 // Ajouter un membre en fin de liste
-liste_membres insererEnQueueMembre(liste_membres liste, char numero_membre[TAILLE_L], char nom_membre[TAILLE_XL], char prenoms_membre[TAILLE_XL], char adresse_membre[TAILLE_XXL], struct formation *formations_membre);
+liste_membres insererEnQueueMembre(liste_membres ancienne_liste_membres, char *numero_membre, char *nom_membre, char *prenoms_membre, char *adresse_membre, liste_formations formations_membre);
+// Rechercher un membre dans une liste
+int rechercherUnMembre(liste_membres liste, char *numero_membre);
+// Afficher un membre
+void afficherUnMembre(liste_membres liste, char *numero_membre);
+// Supprimer un membre
+int supprimerUnMembre(liste_membres liste, char *numero_membre);
 // Afficher la liste des membres
 void afficherListeMembres(liste_membres liste);
 // Créer une liste de formations vide
-liste_formations creerFormation();
+liste_formations creerListeFormation();
+// Ajouter un membre en fin de liste
+liste_formations insererEnQueueFormation(liste_formations ancienne_liste_formations, char *code_formation, char *intitule_formation, char *annee_formation);
+// Afficher la liste des formations
+void afficherListeFormations(liste_formations liste);

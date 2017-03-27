@@ -23,3 +23,5 @@
 #define TAILLE_XL 25
 // Définition de la constante TAILLE_XXL (taille grande)
 #define TAILLE_XXL 50
+// Définition de la constante TAILLE_MAX_LIGNE_FICHIER_MEMBRES (taille maximum d'une ligne d'informations dans le fichier des membres)
+#define TAILLE_MAX_LIGNE_FICHIER_MEMBRES 1000

@@ -1,8 +1,8 @@
-1:NomA:Prenoms A:Adresse de A:1:SGBD:2016/2017:2:POOJ:2015/2016
+1:NomA:Prenoms A:Adresse de A
 2:NomB:Prenoms B:Adresse de B
 3:NomC:Prenoms C:Adresse de C
 4:NomD:Prenoms D:Adresse de D
 5:NomE:Prenoms E:Adresse de E
 6:NomF:Prenoms F:Adresse de F
-7:test:test:test
-8:test:test:test:sgdfg:qfsdff:2016/2017:5665qsd:6853sqd:2016/2017
+6:NomF:Prenoms F:Adresse de F
+

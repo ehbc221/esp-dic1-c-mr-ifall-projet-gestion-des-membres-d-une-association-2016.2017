@@ -322,9 +322,8 @@ int connection()
 	char login_saisi[TAILLE_XL], mot_de_passe_saisi[TAILLE_XL], ligne_utilisateur[TAILLE_XXL], delimiteur[2]=":", *cle, login_temporaire[TAILLE_XL], mot_de_passe_temporaire[TAILLE_XL];
 	int status_connection=ECHEC, indice_cle=0, utilisateur_trouve=0, sortir_app=0;
 	FILE* fichier_utilisateurs = NULL;
-	liste_utilisateurs liste_utilisateur;
 	// On ouvre le fichier contenant les utilisateurs (utilisateurs.txt)
-	fichier_utilisateurs = fopen("utilisateurs.txt", "r");
+	fichier_utilisateurs = fopen("fichiers/fichier_utilisateurs.txt", "r");
 	// On teste si l'ouverture s'est bien déroulée. Dans le cas échéant, on peut continuer le traitement du fichier
 	if (fichier_utilisateurs != NULL) {
 		// Saisie des identifiants (login & du mot de passe) de connection
@@ -337,10 +336,9 @@ int connection()
 		printf("Saisissez votre mot de passe : ");
 		fgets(mot_de_passe_saisi, sizeof mot_de_passe_saisi, stdin);
 		enleverCaracteresRestants(mot_de_passe_saisi);
-		// Créer une nouvelle liste d'utilisateurs (vide)
-		liste_utilisateur = creerUtilisateur();
 		// Tant qu'on n'arrive pas à la fin du fichier et que l'on n'a pas trouvé un utilisateur correspondant aux identifiants 
 		while(fgets(ligne_utilisateur, TAILLE_XXL, fichier_utilisateurs) != NULL && utilisateur_trouve == 0) {
+			enleverCaracteresRestants(ligne_utilisateur);
 			cle = strtok(ligne_utilisateur, delimiteur);
 			indice_cle = 0;
 			while(cle != NULL) {
@@ -355,8 +353,7 @@ int connection()
 				indice_cle++;
 				cle = strtok(NULL, delimiteur);
 			}
-			liste_utilisateur = insererEnQueueUtilisateur(liste_utilisateur, login_temporaire, mot_de_passe_temporaire);
-			if (strcmp(liste_utilisateur->login_utilisateur, login_saisi) == 0 && strcmp(liste_utilisateur->mot_de_passe_utilisateur, mot_de_passe_saisi) == 0) {
+			if (strcmp(login_temporaire, login_saisi) == 0 && strcmp(mot_de_passe_temporaire, mot_de_passe_saisi) == 0) {
 				utilisateur_trouve = 1;
 				status_connection = SUCCES;
 			}
@@ -443,13 +440,13 @@ liste_membres chargerListeMembres()
 	liste_formations formations_temporaires;
 	membres_temporaires = creerMembre();
 	FILE* fichier_membres = NULL;
-	fichier_membres = fopen("membres.txt", "r");
+	fichier_membres = fopen("fichiers/fichier_membres.txt", "r");
 	// On teste si l'ouverture s'est bien déroulée. Dans le cas échéant, on peut continuer le traitement du fichier
 	if (fichier_membres != NULL) {
 		// Tant qu'on n'arrive pas à la fin du fichier
 		while(fgets(ligne_membre, TAILLE_MAX_LIGNE_FICHIER_MEMBRES, fichier_membres) != NULL) {
-			formations_temporaires = creerFormation();
 			enleverCaracteresRestants(ligne_membre);
+			formations_temporaires = creerFormation();
 			cle = strtok(ligne_membre, delimiteur);
 			indice_cle = 0;
 			printf("\n\tLIGNE\n");
@@ -804,7 +801,7 @@ void enregistrerListeMembres(liste_membres liste) {
 	// On déclare une variable qui nous permettra de travailler sur le fichier
 	FILE* fichier_membres = NULL;
 	// On ouvre le fichier contenant les membres (membres.txt) en mode lecture
-	fichier_membres = fopen("membres.txt", "w");
+	fichier_membres = fopen("fichiers/fichier_membres.txt", "w");
 	// On teste si l'ouverture s'est bien déroulée. Dans le cas échéant, on peut continuer le traitement du fichier
 	if (fichier_membres != NULL) {
 		liste_membres temporaire=liste;
@@ -909,7 +906,7 @@ void enleverCaracteresRestants(char *chaine)
 	char *p = strchr(chaine, '\n');
 	// Si on le trouve, on annule sa valeur
 	if (p)
-		*p = 0;
+		*p = '\0';
 	// Sinon : cas où la dernière saisie ne s'est pas déroulée correctement (ou on a dépassé le nombre de caractères max spécifié en deuxième argument) alors la seconde saisie va contenir les caractères qui n'ont pas été lus
 	else
 		enleverCaracteresSuperflus();
