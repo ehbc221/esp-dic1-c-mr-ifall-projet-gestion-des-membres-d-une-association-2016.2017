@@ -5,5 +5,6 @@
 5:NomE:Prenoms E:Adresse de E
 6:NomF:Prenoms F:Adresse de F
 9:nom:prenoms membre:adresse membre:code:intitule1:2013/2014:code2:intitule2:2014/2015:code3:intitule3:2015/2016
-10:tt:tt:tt:ds:eds:2016/2017:ezdf:zasd:2016/2017:53zqsd:q584s2wxc:2013/2014
-8:zzzzzzzzz:zzzzzzzzz:zzzzzzzz:6852:zzzzz:2016/2017:ZSDF6542:zzzzzzzzzzz:2016/2017
+8:nouveau nom:nouveau prenom:nouvelle adresse:6852:zzzzz:2016/2017:ZSDF6542:zzzzzzzzzzz:2016/2017
+11:diop:maguette:Dakar Senegal:code 1:intitule 1:2016/2017:code 2:intitule 2:2015/2016
+12:t:t:t:t:t:2016/2017:s:s:2015/2016:f:f:2014/2015

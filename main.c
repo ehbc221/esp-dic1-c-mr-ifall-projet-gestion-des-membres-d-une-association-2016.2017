@@ -18,25 +18,6 @@ int main()
     char choix_sortie[TAILLE_L];
     // Nettoyer l'écran (effacer tout le contenu)
     clearScreen();
-    /*
-        TESTS
-    */
-        // MEMBRES
-        liste_membres test_lm = creerListeMembre();
-        int j;
-        for (j=0; j<3; j++) {
-            // FORMATIONS
-            liste_formations test_lf = creerListeFormation();
-            int i;
-            for (i=0; i<3; i++) {
-                test_lf = insererEnQueueFormation(test_lf, "51SF", "SGBD", "2016/2017");
-            }
-            test_lm = insererEnQueueMembre(test_lm, "1", "CISSE", "EL HADJ BABACAR", "MARISTE", test_lf);
-        }
-        afficherListeMembres(test_lm);
-    /*
-        FIN TESTS
-    */
     // On affiche l'entete (accueil) de l'application
     afficherIntitule();
     // On demande à l'utilisareur de se connecter tant qu'il n'a pas choisi de quitter, ou qu'il ne s'est pas connecté

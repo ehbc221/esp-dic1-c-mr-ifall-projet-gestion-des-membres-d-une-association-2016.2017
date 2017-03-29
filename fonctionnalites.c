@@ -537,7 +537,7 @@ liste_membres modifierMembre(liste_membres membres)
                     printf("\nFormation modifiee avec succes.\n");
                 }
                 else {
-                    printf("\nAucune formation ne correspond a ce code.");
+                    printf("\nAucune formation ne correspond a ce code.\n");
                 }
             }
         }
@@ -560,13 +560,7 @@ liste_membres modifierMembre(liste_membres membres)
                 }
                 test = rechercherUneFormation(liste_formations_temporaire, code_formation);
                 if (test = SUCCES) {
-                    test = supprimerUneFormation(liste_formations_temporaire, code_formation);
-                    if (test == SUCCES) {
-                        printf("\nFormation supprimee avec succes.\n");
-                    }
-                    else {
-                        printf("\nImpossible de supprimer cette formation.\n");
-                    }
+                    liste_formations_temporaire = supprimerUneFormation(liste_formations_temporaire, code_formation);
                 }
                 else {
                     printf("\nCe code ne correspond a aucune formation.\n");
@@ -603,13 +597,7 @@ liste_membres supprimerMembre(liste_membres liste)
     if (test == SUCCES) {
         printf("\nVoici le membre que vous allez supprimer :\n");
         afficherUnMembre(liste, numero_membre);
-        test = supprimerUnMembre(liste, numero_membre);
-        if (test == SUCCES) {
-            printf("\nMembre supprime avec succes.\n");
-        }
-        else {
-            printf("\nImpossible de supprimer ce membre.\n");
-        }
+        liste = supprimerUnMembre(liste, numero_membre);
     }
     else {
         printf("\nCe membre n'existe pas.\n");

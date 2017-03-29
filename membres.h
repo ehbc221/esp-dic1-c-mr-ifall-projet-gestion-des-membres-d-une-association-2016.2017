@@ -33,7 +33,7 @@ int rechercherUnMembre(liste_membres liste, char *numero_membre);
 // Afficher un membre
 void afficherUnMembre(liste_membres liste, char *numero_membre);
 // Supprimer un membre
-int supprimerUnMembre(liste_membres liste, char *numero_membre);
+liste_membres supprimerUnMembre(liste_membres liste, char *numero_membre);
 // Afficher la liste des membres
 void afficherListeMembres(liste_membres liste);
 // Créer une liste de formations vide
@@ -45,4 +45,4 @@ void afficherListeFormations(liste_formations liste);
 // Rechercher une formation dans une liste
 int rechercherUneFormation(liste_formations liste, char *code_formation);
 // Supprimer une formation
-int supprimerUneFormation(liste_formations liste, char *code_formation);
+liste_formations supprimerUneFormation(liste_formations liste, char *code_formation);

@@ -89,9 +89,9 @@ void afficherUnMembre(liste_membres liste, char *numero_membre)
     }
 }
 // Supprimer un membre
-int supprimerUnMembre(liste_membres liste, char *numero_membre)
+liste_membres supprimerUnMembre(liste_membres liste, char *numero_membre)
 {
-    int test=ECHEC;
+    int supprimer_en_tete=ECHEC, test=ECHEC;
     liste_membres temporaire=liste;
     liste_membres avant_dernier=liste;
     // On parcours tous les éléments de la liste
@@ -100,15 +100,17 @@ int supprimerUnMembre(liste_membres liste, char *numero_membre)
         if (strcmp(numero_membre, temporaire->numero_membre) == 0) {
             // Si c'est le premier element de la liste qui coincide => algo supprimer premier
             if (temporaire == liste && strcmp(numero_membre, temporaire->numero_membre) == 0) {
-                liste = NULL;
+                avant_dernier = avant_dernier->suivant;
                 free(temporaire);
-                return test = SUCCES;
+                supprimer_en_tete = SUCCES;
+                break;
             }
             // Sinon si c'est un autre membre qui coincide => algo supprimer membre quelconque
             else if (strcmp(numero_membre, temporaire->numero_membre) == 0) {
                 avant_dernier->suivant = temporaire->suivant;
                 free(temporaire);
-                return test = SUCCES;
+                test = SUCCES;
+                break;
             }
         }
         // Sinon (si les membres ne coincident pas)
@@ -117,7 +119,19 @@ int supprimerUnMembre(liste_membres liste, char *numero_membre)
             temporaire = temporaire->suivant;
         }
     }
-    return test = ECHEC;
+    if (supprimer_en_tete == SUCCES || test == SUCCES) {
+        printf("\nMembre supprime avec succes.\n");
+        if (supprimer_en_tete == SUCCES) {
+            return avant_dernier;
+        }
+        else {
+            return liste;
+        }
+    }
+    else {
+        printf("\nImpossible de supprimer ce membre.\n");
+        return liste;
+    }
 }
 // Afficher la liste des membres
 void afficherListeMembres(liste_membres liste)
@@ -191,9 +205,9 @@ int rechercherUneFormation(liste_formations liste, char *code_formation)
     return test=ECHEC;
 }
 // Supprimer une formation
-int supprimerUneFormation(liste_formations liste, char *code_formation)
+liste_formations supprimerUneFormation(liste_formations liste, char *code_formation)
 {
-    int test=ECHEC;
+    int supprimer_en_tete=ECHEC, test=ECHEC;
     liste_formations temporaire=liste;
     liste_formations avant_dernier=liste;
     // On parcours tous les éléments de la liste
@@ -202,15 +216,17 @@ int supprimerUneFormation(liste_formations liste, char *code_formation)
         if (strcmp(code_formation, temporaire->code_formation) == 0) {
             // Si c'est le premier element de la liste qui coincide => algo supprimer premier
             if (temporaire == liste && strcmp(code_formation, temporaire->code_formation) == 0) {
-                liste = NULL;
+                avant_dernier = avant_dernier->suivant;
                 free(temporaire);
-                return test = SUCCES;
+                supprimer_en_tete = SUCCES;
+                break;
             }
             // Sinon si c'est un autre membre qui coincide => algo supprimer membre quelconque
             else if (strcmp(code_formation, temporaire->code_formation) == 0) {
                 avant_dernier->suivant = temporaire->suivant;
                 free(temporaire);
-                return test = SUCCES;
+                test = SUCCES;
+                break;
             }
         }
         // Sinon (si les membres ne coincident pas)
@@ -219,5 +235,17 @@ int supprimerUneFormation(liste_formations liste, char *code_formation)
             temporaire = temporaire->suivant;
         }
     }
-    return test = ECHEC;
+    if (supprimer_en_tete == SUCCES || test == SUCCES) {
+        printf("\nFormation supprimee avec succes.\n");
+        if (supprimer_en_tete == SUCCES) {
+            return avant_dernier;
+        }
+        else {
+            return liste;
+        }
+    }
+    else {
+        printf("\nImpossible de supprimer cette formation.\n");
+        return liste;
+    }
 }
