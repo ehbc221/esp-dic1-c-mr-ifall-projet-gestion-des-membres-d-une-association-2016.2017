@@ -1,10 +1,7 @@
-1:NomA:Prenoms A:Adresse de A:1:SGBD:2016/2017:2:POOJ:2015/2016
-2:NomB:Prenoms B:Adresse de B
-3:NomC:Prenoms C:Adresse de C
-4:NomD:Prenoms D:Adresse de D
-5:NomE:Prenoms E:Adresse de E
-6:NomF:Prenoms F:Adresse de F
-9:nom:prenoms membre:adresse membre:code:intitule1:2013/2014:code2:intitule2:2014/2015:code3:intitule3:2015/2016
-8:nouveau nom:nouveau prenom:nouvelle adresse:6852:zzzzz:2016/2017:ZSDF6542:zzzzzzzzzzz:2016/2017
-11:diop:maguette:Dakar Senegal:code 1:intitule 1:2016/2017:code 2:intitule 2:2015/2016
-12:t:t:t:t:t:2016/2017:s:s:2015/2016:f:f:2014/2015
+1:NomA:Prenoms A:Adresse de A:Code A:Intitule A:2016/2017:Code B:Intitule B:2016/2017
+2:NomB:Prenoms B:Adresse de B:Code B:Intitule B:2016/2017:Code B:Intitule B:2016/2017:Code B:Intitule B:2016/2017
+3:NomC:Prenoms C:Adresse de C:Code C:Intitule C:2016/2017
+4:NomD:Prenoms D:Adresse de D:Code D:Intitule D:2016/2017:Code D:Intitule D:2016/2017
+5:NomE:Prenoms E:Adresse de E:Code E:Intitule E:2016/2017:Code E:Intitule E:2016/2017
+6:NomF:Prenoms F:Adresse de F:Code F:Intitule F:2016/2017
+

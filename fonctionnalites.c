@@ -22,10 +22,10 @@ void afficherIntitule()
     printf("\n------\n");
     printf("\nGroupe :");
     printf("\n-------\n");
-    printf("\t1) TEST test\n");
-    printf("\t2) TEST test\n");
-    printf("\t3) TEST test\n");
-    printf("\t4) TEST test\n");
+    printf("\t1) El Hadj Babacar Cisse\n");
+    printf("\t2) Maguette Diop\n");
+    printf("\t3) Mah Aminata Ndiaye\n");
+    printf("\t4) Abibatou Ngom\n");
     printf("\n\nBienvenue dans l'application de gestion des membres d'une association. Connectez-vous pour commencer.\n\n");
 }
 // Se connecter à l'application
@@ -82,6 +82,7 @@ int connection()
     }
     // Si l'ouverture ne s'est pas bien déroulée, on retourne un code d'érreur (-1)
     else {
+        printf("Impossible d'ouvrir le fichier des utilisateurs.\n");
         return test = ERREUR;
     }
     fclose(fichier_utilisateurs);
@@ -90,7 +91,7 @@ int connection()
 // Afficher le menu de l'application sélectionner une option
 int afficherEtChoisirOptionsMenu()
 {
-    char choix[10], choix_possibles[5][8]={"1", "2", "3", "4", "quitter"};
+    char choix[10], choix_possibles[5][8]={"1", "2", "3", "4", "5"};
     int i, test=ECHEC;
     printf("\n /------------\\\n");
     printf("|     Menu     |");
@@ -99,9 +100,10 @@ int afficherEtChoisirOptionsMenu()
     printf("2) Rechercher un membre.\n");
     printf("3) Modifier un membre.\n");
     printf("4) Supprimer un membre.\n");
+    printf("5) Quitter.\n");
     // Demander à l'utilisateur de choisir un numero tant son choix n'est pas valide
     while (test == ECHEC) {
-        printf("\nSaisissez le numero de votre choix pour continuer (ou tapez 'quitter' pour sortir de l'application) : ");
+        printf("\nSaisissez le numero de votre choix pour continuer : ");
         fgets(choix, sizeof choix, stdin);
         enleverCaracteresRestants(choix);
         if (strcmp(choix, choix_possibles[0]) != 0 && strcmp(choix, choix_possibles[1]) != 0 && strcmp(choix, choix_possibles[2]) != 0 && strcmp(choix, choix_possibles[3]) != 0 && strcmp(choix, choix_possibles[4]) != 0) {
@@ -118,7 +120,9 @@ int afficherEtChoisirOptionsMenu()
         }
     }
     // Sinon retourner -2 (QUITTER)
-    return QUITTER;
+    if (strcmp(choix, choix_possibles[4]) == 0) {
+        return QUITTER;
+    }
 }
 // Afficher l'entete de l'option choisie ( depuis le menu )
 void afficherEnteteOptionChoisie(int numero_option)
@@ -238,6 +242,7 @@ liste_membres insererNouveauMembre(liste_membres liste)
                 liste_membres_temporaire = liste_membres_temporaire->suivant;
             }
         }
+        test1 = ECHEC;
         if (test1 == SUCCES) {
             printf("\nCe numero de membre existe deja. Veuillez en retaper un autre.\n");
         }
@@ -325,7 +330,7 @@ liste_membres insererNouveauMembre(liste_membres liste)
     // Ajouter dans la structure
     liste_membres_temporaire = insererEnQueueMembre(liste_membres_temporaire, numero_membre, nom_membre, prenoms_membre, adresse_membre, liste_formations_temporaire);
     printf("\nVoici le membre que vous venez d'ajouter :\n");
-    afficherUnMembre(liste, numero_membre);
+    afficherUnMembre(liste_membres_temporaire, numero_membre);
     return liste_membres_temporaire;
 }
 // Rechercher un membre ( dans la liste des membres )
@@ -363,7 +368,7 @@ void rechercherMembre(liste_membres liste)
 liste_membres modifierMembre(liste_membres membres)
 {
     if (membres == NULL) {
-        printf("\nAucun membre a afficher. La liste des membres est vide.\n");
+        printf("\nAucun membre a modifier. La liste des membres est vide.\n");
         return NULL;
     }
     char choix[TAILLE_L], numero_membre[TAILLE_L], code_formation[TAILLE_L], intitule_formation[TAILLE_L], annee_formation[TAILLE_L];
@@ -542,9 +547,7 @@ liste_membres modifierMembre(liste_membres membres)
             }
         }
         else if (compteur == 4) {
-            liste_formations liste_formations_temporaire = liste_membres_temporaire->formations_membre;
-            liste_formations avant = liste_membres_temporaire->formations_membre;
-            if (liste_formations_temporaire ==  NULL) {
+            if (liste_membres_temporaire->formations_membre ==  NULL) {
                 printf("\nAucune formation a modifier.\n");
             }
             else {
@@ -558,9 +561,9 @@ liste_membres modifierMembre(liste_membres membres)
                         printf("\n\tLe code de la formation ne doit contenir que des lettres alphabetiques et/ou espaces. Veuillez le retaper s'il vous plait.\n");
                     }
                 }
-                test = rechercherUneFormation(liste_formations_temporaire, code_formation);
+                test = rechercherUneFormation(liste_membres_temporaire->formations_membre, code_formation);
                 if (test = SUCCES) {
-                    liste_formations_temporaire = supprimerUneFormation(liste_formations_temporaire, code_formation);
+                    liste_membres_temporaire->formations_membre = supprimerUneFormation(liste_membres_temporaire->formations_membre, code_formation);
                 }
                 else {
                     printf("\nCe code ne correspond a aucune formation.\n");
@@ -580,6 +583,7 @@ liste_membres modifierMembre(liste_membres membres)
 liste_membres supprimerMembre(liste_membres liste)
 {
     if (liste == NULL) {
+        printf("Aucun membre a supprimer. La liste des membres est vide.");
         return ECHEC;
     }
     char numero_membre[TAILLE_L];

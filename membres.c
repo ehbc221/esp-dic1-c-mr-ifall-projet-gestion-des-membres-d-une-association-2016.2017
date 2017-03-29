@@ -95,7 +95,7 @@ liste_membres supprimerUnMembre(liste_membres liste, char *numero_membre)
     liste_membres temporaire=liste;
     liste_membres avant_dernier=liste;
     // On parcours tous les éléments de la liste
-    while(temporaire != NULL && test == ECHEC) {
+    while(temporaire != NULL && test == ECHEC && supprimer_en_tete=ECHEC) {
         // Si on trouve le membre (celui avec le meme numero)
         if (strcmp(numero_membre, temporaire->numero_membre) == 0) {
             // Si c'est le premier element de la liste qui coincide => algo supprimer premier
@@ -159,7 +159,7 @@ liste_formations creerListeFormation()
     liste_formations nouvelle_formation = NULL;
     return nouvelle_formation;
 }
-// Ajouter un membre en fin de liste
+// Ajouter une formation en fin de liste
 liste_formations insererEnQueueFormation(liste_formations ancienne_liste_formations, char *code_formation, char *intitule_formation, char *annee_formation)
 {
     liste_formations nouvelle_formation = malloc(sizeof(formation));
@@ -211,7 +211,7 @@ liste_formations supprimerUneFormation(liste_formations liste, char *code_format
     liste_formations temporaire=liste;
     liste_formations avant_dernier=liste;
     // On parcours tous les éléments de la liste
-    while(temporaire != NULL && test == ECHEC) {
+    while(temporaire != NULL && test == ECHEC && supprimer_en_tete=ECHEC) {
         // Si on trouve le membre (celui avec le meme numero)
         if (strcmp(code_formation, temporaire->code_formation) == 0) {
             // Si c'est le premier element de la liste qui coincide => algo supprimer premier

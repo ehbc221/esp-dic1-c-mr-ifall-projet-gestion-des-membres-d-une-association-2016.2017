@@ -41,20 +41,17 @@ int main()
     do {
         // Nettoyer l'écran (effacer tout le contenu)
         clearScreen();
-        afficherListeMembres(liste);
         // Une fois l'utilisateur connecté, on lui affiche le menu de l'application et lui demande de choisir une option
         choix_menu = afficherEtChoisirOptionsMenu();
         // S'il a choisi de quitter l'application, on lui affiche un message de sortie puis on arrete le programme. Sinon, on continue
         if (choix_menu == QUITTER) {
             sortir_app = SUCCES;
             afficherMessageSortie();
-            afficherListeMembres(liste);
             enregistrerListeMembres(liste);
             return sortir_app;
         }
         // Nettoyer l'écran (effacer tout le contenu)
         clearScreen();
-        afficherListeMembres(liste);
         // On affiche l'entete de l'option choisie
         afficherEnteteOptionChoisie(choix_menu);
         switch (choix_menu) {
@@ -76,19 +73,15 @@ int main()
                 break;
             default :
                 sortir_app = SUCCES;
-                afficherMessageSortie();
-                afficherListeMembres(liste);
-                enregistrerListeMembres(liste);
-                return sortir_app;
+                break;
         }
-        printf("\nTapez 'quitter' pour sortir de l'application, ou toute autre phrase pour revenir au menu : ");
-        fgets(choix_sortie, sizeof choix_sortie, stdin);
-        enleverCaracteresRestants(choix_sortie);
-        sortir_app = verifierSortie(choix_sortie);
-        if (sortir_app == QUITTER) {
-            sortir_app = SUCCES;
+        if (sortir_app == ECHEC) {
+            printf("\nTapez <entree> pour revenir au menu : ");
+            fgets(choix_sortie, sizeof choix_sortie, stdin);
+            enleverCaracteresRestants(choix_sortie);
+        }
+        else {
             afficherMessageSortie();
-            afficherListeMembres(liste);
             enregistrerListeMembres(liste);
             return sortir_app;
         }
