@@ -242,7 +242,6 @@ liste_membres insererNouveauMembre(liste_membres liste)
                 liste_membres_temporaire = liste_membres_temporaire->suivant;
             }
         }
-        test1 = ECHEC;
         if (test1 == SUCCES) {
             printf("\nCe numero de membre existe deja. Veuillez en retaper un autre.\n");
         }
